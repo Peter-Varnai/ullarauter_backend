@@ -1,0 +1,68 @@
+
+
+</body>
+<footer>
+
+    <script src="/static/full_menu_collapse.js"></script>
+
+    <script src="/static/works_menu_collapse.js"></script>
+
+    <script>
+        let prjTitle = document.querySelector('.prcssdf');
+        let prjTitleSidebar = document.querySelector('.sidebar_project_ttl'); 
+
+        if (prjTitle && prjTitleSidebar) {
+            if (prjTitle.textContent.trim() !== "") {
+                prjTitleSidebar.innerHTML = prjTitle.textContent.trim();
+            } else {
+                prjTitleSidebar.innerHTML = "";
+            }
+        } else {
+            console.log("Either prjTitle or prjTitleSidebar is missing.");
+        }       
+
+        let cUrl = window.location.href
+        let sidebarLinks = document.querySelectorAll(".sidebar_menu");
+
+        sidebarLinks.forEach(link => {
+            link.classList.remove('active');
+            if (cUrl.includes("bio") && link.href.includes("bio")) {
+                link.classList.add('active');
+            } else if (cUrl.includes("contact") && link.href.includes("contact")) {
+                link.classList.add('active');
+            } else if (cUrl.includes("project") && link.href.includes("project")) {
+                link.classList.add('active');
+            }
+        });  
+
+        sidebarLinks.forEach(function(link) {
+            var linkUrl = link.href.split(/[?#]/)[0];
+            if (linkUrl === currentPageUrl) {
+                link.classList.add("active");
+            }
+        });
+
+        function language_change(lang) {
+            fetch("/set_language", { // Update the endpoint to match your backend route
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ language: lang }), // Send the selected language
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload(); // Reload the page to reflect the language chang
+                    } else {
+                        alert('Failed to change language.'); // Handle errors
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while changing the language.');
+                });
+        }  
+    </script>
+
+</footer>
+</html>

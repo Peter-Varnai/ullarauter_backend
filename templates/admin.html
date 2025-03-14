@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f0f4f8; /* Softer background color */
+            color: #333;
+        }
+
+        .nav-tabs .nav-link.active {
+            background-color: #007bff; /* Active tab color */
+            color: #fff;
+        }
+
+        .tab-content {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control, .btn {
+            border-radius: 5px;
+        }
+
+        .ck-editor__editable_inline {
+            min-height: 200px;
+        }
+    </style>
+    <script src="https://cdn.ckeditor.com/ckeditor5/34.1.0/classic/ckeditor.js"></script>
+</head>
+<body>
+<div class="container my-5">
+    <h2 class="text-center mb-4">Admin Panel</h2>
+    <div class="container text-center mt-5 mb-4">
+        <button onclick="logout()" class="btn btn-danger">Log Out</button>
+    </div>
+
+    <ul class="nav nav-tabs" id="adminTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="create-project-tab" data-toggle="tab" href="#create-project" role="tab"
+               aria-controls="create-project" aria-selected="true">Create Project</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="front-page-tab" data-toggle="tab" href="#front-page" role="tab"
+               aria-controls="front-page" aria-selected="false">Front Page</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="exhibition-tab" data-toggle="tab" href="#exhibition" role="tab"
+               aria-controls="exhibition" aria-selected="false">Exhibition</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="bio-tab" data-toggle="tab" href="#bio" role="tab" aria-controls="bio"
+               aria-selected="false">Bio</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="cv-tab" data-toggle="tab" href="#cv" role="tab" aria-controls="cv"
+               aria-selected="false">CV</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="edit-project-tab" data-toggle="tab" href="#edit-project" role="tab"
+               aria-controls="edit-project" aria-selected="false">Edit Projects</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="delete-exhibition-tab" data-toggle="tab" href="#delete-exhibition" role="tab"
+               aria-controls="delete-exhibition" aria-selected="false">Delete</a>
+        </li>
+    </ul>
+    <div class="tab-content mt-3" id="adminTabContent">
+        <!-- Create Project Form -->
+        <div class="tab-pane fade show active" id="create-project" role="tabpanel" aria-labelledby="create-project-tab">
+            <form action="/create_project" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Project Name (eng):</label>
+                    <input type="text" name="title_eng" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Project Name (de):</label>
+                    <input type="text" name="title_de" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="date" name="date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Images:</label>
+                    <input type="file" name="pictures" class="form-control" multiple>
+                </div>
+                <div class="form-group">
+                    <label>Video Embed Code:</label>
+                    <input type="text" name="video" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Project Text (eng):</label>
+                    <textarea name="text_eng" class="form-control ckeditor"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Project Text (de):</label>
+                    <textarea name="text_de" class="form-control ckeditor"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload Project</button>
+            </form>
+        </div>
+
+        <!-- Front Page Form -->
+        <div class="tab-pane fade" id="front-page" role="tabpanel" aria-labelledby="front-page-tab">
+            <form action="/upload_background" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Project Name (eng):</label>
+                    <input type="text" name="title_eng" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Project Name (de):</label>
+                    <input type="text" name="title_de" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Image:</label>
+                    <input type="file" name="image" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload Background</button>
+            </form>
+        </div>
+
+        <!-- Exhibition Form -->
+        <div class="tab-pane fade" id="exhibition" role="tabpanel" aria-labelledby="exhibition-tab">
+            <form action="/add_exhibition" method="POST">
+                <div class="form-group">
+                    <label>Exhibition Title (eng):</label>
+                    <input type="text" name="title_eng" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Exhibition Title (de):</label>
+                    <input type="text" name="title_de" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>From:</label>
+                    <input type="date" name="from" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Until:</label>
+                    <input type="date" name="till" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Location:</label>
+                    <input type="text" name="location" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Title Link (optional):</label>
+                    <input type="text" name="link" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Exhibition</button>
+            </form>
+        </div>
+
+        <!-- Bio Profile Picture -->
+        <div class="tab-pane fade" id="bio" role="tabpanel" aria-labelledby="bio-tab">
+            <form action="/update_profile_picture" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label>Profile Picture:</label>
+                    <input value="{{ personal_details[2] }}" type="file" name="profile_pic" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Profile Picture</button>
+            </form>
+            <form action="/update_bio" method="POST">
+                <div class="form-group">
+                    <label>Bio Text (eng):</label>
+                    <textarea name="bio_eng" class="form-control ckeditor">{{ personal_details[0] }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Bio Text (de):</label>
+                    <textarea name="bio_de" class="form-control ckeditor">{{ personal_details[1] }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit New Bio</button>
+            </form>
+        </div>
+
+        <!-- CV Form -->
+        <div class="tab-pane fade" id="cv" role="tabpanel" aria-labelledby="cv-tab">
+            <form action="/update_cv" method="POST">
+                <div class="form-group">
+                    <label>English CV Link:</label>
+                    <input value="{{ personal_details[3] }}" type="text" name="cv_eng_address" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>German CV Link:</label>
+                    <input value="{{ personal_details[4] }}" type="text" name="cv_de_address" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit New CV</button>
+            </form>
+        </div>
+
+
+        <!--        EDIT PROJECT SECTION        -->
+
+
+        <div class="tab-pane fade" id="edit-project" role="tabpanel" aria-labelledby="edit-project-tab">
+            <h3>Edit Projects</h3>
+            <div class="form-section">
+                <label for="dropdownMenu">Select Project:</label>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle form-control text-start" type="button"
+                            id="dropdownMenu"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Edit project
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
+                        {% for project in projects %}
+                        <li>
+                            <a class="dropdown-item" href="/admin?edit_project={{ project[1] }}">{{ project[0] }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <form class="edit-project-components" action="/edit_project" method="POST" enctype="multipart/form-data">
+                <div class="form-section">
+                    <label>Project Name (eng):</label>
+                    <input value="{{ edit_project[0] }}" type="text" name="title" class="form-control" required>
+                </div>
+                <div class="form-section">
+                    <label>Project Name (de):</label>
+                    <input value="{{ edit_project[5] }}" type="text" name="title_de" class="form-control" required>
+                </div>
+                <div class="form-section">
+                    <label>Release Date:</label>
+                    <input value="{{ edit_project[7] }}" type="date" name="date" class="form-control" required>
+                </div>
+                <div class="form-section">
+                    <label>Images:</label>
+                    <input type="file" name="ima2ges" multiple class="form-control" required>
+                </div>
+                <div class="form-section">
+                    <label>Video Embed Code:</label>
+                    <input value="{{ edit_project[3] }}" type="text" name="video" class="form-control" required>
+                </div>
+                <div class="form-section">
+                    <label>Project Text (eng):</label>
+                    <textarea name="text_eng" class="form-control ckeditor">{{ edit_project[1] }}</textarea>
+                </div>
+                <div class="form-section">
+                    <label>Project Text (de):</label>
+                    <textarea name="text_de" class="form-control ckeditor">{{ edit_project[2] }}</textarea>
+                </div>
+                <div class="form-section text-center">
+                    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                </div>
+            </form>
+
+            <h3 class="edit-project-components">Add image comments</h3>
+            <div class="form-section edit-project-components">
+                <div class="container">
+                    <div class="row">
+                        {% for pic in img_comm %}
+                        <div class="col-md-4 col-sm-6 mb-4">
+                            <div class="card">
+                                <img class="card-img-top img-thumbnail popImage"
+                                     style="opacity: 50%; border: 0 solid white;"
+                                     src="/static/projects/{{ edit_project[6] }}/{{ pic[0] }}" alt="Image Thumbnail">
+                                <div class="card-body">
+                                    <form action="/add_comment" method="POST">
+                                        <input type="hidden" name="folder" value="{{ edit_project[6] }}">
+                                        <input type="hidden" name="file" value="{{ pic[0]}}">
+                                        <div class="mb-3">
+                                            <label class="form-label">Image Comment (eng):</label>
+                                            <input type="text" name="eng_comment" value="{{ pic[1] }}" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Image Comment (de):</label>
+                                            <input type="text" name="de_comment" value="{{ pic[2] }}" class="form-control" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Add Comment</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DELETE ENTRIES SECTION -->
+
+        <div class="tab-pane fade" id="delete-exhibition" role="tabpanel" aria-labelledby="delete-exhibition-tab">
+            <h3>Delete Projects/Exhibition/Background</h3>
+            <div class="row">
+                <div class="col-6">
+                    <h5>Project</h5>
+                    <ul class="list-group">
+                        {% for project in projects %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ project[0] }}
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="deleteEntry('{{ project[1] }}', '/delete_project')">
+                                Delete
+                            </button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-6">
+                    <h5>Background</h5>
+                    <ul class="list-group mb-5" >
+                        <!-- Background items go here -->
+                        {% for background in backgrounds %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ background[1] }}
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="deleteEntry('{{ background[4] }}', '/delete_background')">
+                                Delete
+                            </button>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <h5>Exhibitions</h5>
+                    <div class="card">
+                        <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                            <ul class="list-group list-group-flush">
+                                <!-- Exhibition items go here -->
+                                {% for exhibition in exhibitions %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ exhibition[0] }}
+                                    <button class="btn btn-danger btn-sm"
+                                            onclick="deleteEntry('{{ exhibition[4] }}', '/delete_exhibition')">Delete
+                                    </button>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    function logout() {
+        console.log("Logout called")
+        fetch('/logout', { method: 'POST' }).then(response => window.location.reload())
+    }
+
+    function deleteEntry(entryId, query) {
+        console.log(entryId)
+        fetch(query, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({id: entryId}),
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Entry deleted successfully!');
+                    location.reload();
+                } else {
+                    alert('Failed to delete entry.' );
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting an entry.');
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const adminTab = document.getElementById("adminTab");
+
+        // Check if a saved tab ID exists in local storage
+        const savedTabId = localStorage.getItem("activeTabId");
+
+        if (savedTabId) {
+            // Find the saved tab and activate it
+            const savedTabLink = document.querySelector(`[href="${savedTabId}"]`);
+            if (savedTabLink) {
+                new bootstrap.Tab(savedTabLink).show();
+            }
+        }
+
+        // Add a click event listener to save the currently active tab
+        adminTab.addEventListener("click", function (event) {
+            if (event.target && event.target.classList.contains("nav-link")) {
+                localStorage.setItem("activeTabId", event.target.getAttribute("href"));
+            }
+        });
+    });
+
+    if ( '{{ edit_project[0] }}' === '[&quot;empty&quot;]') {
+        document.querySelectorAll('.edit-project-components').forEach(comp => {
+            comp.style.display = "none"
+        })
+    }
+
+    document.querySelectorAll('.ckeditor').forEach(editor => {
+        ClassicEditor
+            .create(editor)
+            .catch(error => console.error(error));
+    });
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<!--<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

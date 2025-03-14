@@ -1,0 +1,135 @@
+{% include "head.html" %}
+{% include "sidebar.html" %}
+
+
+<div class="row site-concent">
+    <!--        PROJECT LIST            -->
+    <div class="col-4">
+        <h3>projects list</h3>
+
+        {% for prj in all_projects %}
+        <div class="row">
+            <div class="col-6">
+                <a href="{{ url_for('admin_edit', edit_project=prj.id) }}">
+                    {{ prj.name }}
+                </a>
+            </div>
+            <div class="col-6" style="color: #bbbbbb">
+                {{ prj.date }}
+            </div>
+            <!--            <div class="col-6">-->
+            <!--                <a href="{{ url_for('delete', project_name=prj.name) }}" style="color: red">del</a>-->
+            <!--            </div>-->
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <div class="col-8 admin_title">
+        <h3 class="admin_title">Edit Project</h3>
+        <form action="{{ url_for('admin_edit', edit_project=edit_pr.id) }}" enctype="multipart/form-data"
+              name="Edit Project" method="POST">
+            {{ edit_proj_form.csrf_token }}
+            <div class="row">
+                <div class="col-4">
+                    {{ edit_proj_form.title.label }}
+                </div>
+                <div class="col-8">
+                    {{ edit_proj_form.title }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    {{ edit_proj_form.title_de.label }}
+                </div>
+                <div class="col-8">
+                    {{ edit_proj_form.title_de }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    {{ edit_proj_form.date.label }}
+                </div>
+                <div class="col-8">
+                    {{ edit_proj_form.date }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    {{ edit_proj_form.images.label }}
+                </div>
+                <div class="col-8">
+                    {{ edit_proj_form.images }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    {{ edit_proj_form.video.label }}
+                </div>
+                <div class="col-8">
+                    {{ edit_proj_form.video }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 ck_editor_title">
+                    {{ edit_proj_form.text_eng.label }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    {{ ckeditor.load() }}
+                    {{ ckeditor.config(name='text_eng') }}
+                    {{ edit_proj_form.text_eng }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 ck_editor_title">
+                    {{ edit_proj_form.text_de.label }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    {{ ckeditor.load() }}
+                    {{ ckeditor.config(name='text_de') }}
+                    {{ edit_proj_form.text_de }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 text-right">
+                    {{ edit_proj_form.submit4 }}
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            {% for img in img_list %}
+            {% set picture_name = img.pictures_folder + " | " + img.filename %}
+            <form method="POST" action="{{ url_for('add_comment', picture_name=picture_name)}}">
+                {{ img['comment_form'].csrf_token }}
+                <div style="margin: 12px 0 " class="col-6">
+                    <img style="max-height: 120px" class="img-thumbnail" src="{{img.url}}">
+                    <spam style="font-size: 12px">{{img.filename}}</spam>
+                    <br>
+                    <spam style="font-size: 12px">
+                        {{ img['comment_form'].eng_comment.label }}:
+                    </spam>
+                    <br>
+                    {{ img['comment_form'].eng_comment }}<br>
+                    <spam style="font-size: 12px">
+                        {{ img['comment_form'].de_comment.label }}:
+                    </spam>
+                    <br>
+                    {{ img['comment_form'].de_comment }}<br>
+                    {{ img['comment_form'].submit }}<br>
+                </div>
+            </form>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+</div>
+
+
+{% include "footer.html" %}

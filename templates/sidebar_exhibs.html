@@ -1,0 +1,34 @@
+<div id="exhibitions">
+    <ul class="frontpage_exhib_list" style="padding: 5% 0; margin: 0">
+        {% for exhib in current_exhib %}
+        <li>
+            {% if exhib[3] != "000" %}
+            <a href="exhib[3]" target="_blank" rel="noopener noreferrer">
+                <h7 style="font-weight: bold; color: white">
+                {{ exhib[0] }}
+                </h7>
+            </a>
+            {% else %}
+            <h7 style="font-weight: bold; color: white">
+            {{ exhib[0] }}
+            </h7>
+            {% endif %}
+
+            {% set date1 = exhib[1] %}
+            {% set date2 = exhib[2] %}
+
+            {% set year1 = date1.split('.').nth(0).unwrap() %}
+            {% set year2 = date2.split('.').nth(0).unwrap() %}
+
+            <p>
+            {% if year1 == year2 %}
+            {{ date1 }} - {{ date2.split('.').nth(1).unwrap() }}.{{ date2.split('.').nth(2).unwrap() }}
+            {% else %}
+            {{ date1 }} - {{ date2 }}
+            {% endif %}
+            </p>
+
+        </li>
+        {% endfor %}
+</div>
+

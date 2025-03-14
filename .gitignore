@@ -1,0 +1,6 @@
+/.sqlx
+/db
+/static
+/target
+/uploads
+.env

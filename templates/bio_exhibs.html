@@ -1,0 +1,25 @@
+
+<table>
+    {% for exhib_group in all_exhibitions %}
+    <tr>
+        <td>
+            {{ exhib_group[0][1][..4] }} 
+        </td>
+    </tr>
+    {% for exhib in exhib_group %}
+    <tr>
+        <td></td>
+        <td class="bio-exhibition">
+            {% if exhib[3] != "000" %}
+            <a href="{{ exhib[3] }}" target="_blank" rel="noopener noreferrer" style="font-weight: 500">
+                {{ exhib[0] }}
+            </a>
+            {% else %}
+            {{ exhib[0] }}
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    {% endfor %}
+</table>
+

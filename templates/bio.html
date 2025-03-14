@@ -1,0 +1,21 @@
+{% include "head.html" %}
+{{ sidebar_html|safe }}
+
+<img class="bio_profilepic_mobile" src="/static/personal_details/{{pfp_url}}">
+<div class="site-concent">
+    <div class="bio-site_content">
+        <img class="bio_profilepic_pc" src="/static/personal_details/{{pfp_url}}">
+        <div class="bio-text">
+            <p>
+            {% if language == "eng" %}
+            {{ bio_eng|safe }}
+            {% else %}
+            {{ bio_de|safe }}
+            {% endif %}
+            </p>
+        </div>
+        {{ exhibs_html|safe }}
+    </div>
+</div>
+
+{% include "footer.html" %}

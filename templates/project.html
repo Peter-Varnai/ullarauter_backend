@@ -1,0 +1,129 @@
+{% include "head.html" %}
+{{ sidebar_html|safe }}
+
+<div id="popup">
+    <div id="x">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+             x="0px" y="0px"
+             viewBox="0 0 40 40" style="enable-background:new 0 0 40 40;" xml:space="preserve">
+        <style type="text/css">
+            .st0 {
+                fill: none;
+                stroke: #ffffff;
+                stroke-width: 4;
+                stroke-miterlimit: 10;
+            }
+        </style>
+            <line class="st0" x1="0" y1="0" x2="40" y2="40"/>
+            <line class="st0" x1="40" y1="0" x2="0" y2="40"/>
+    </svg>
+    </div>
+    <div id="left" class="arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+             x="0px" y="0px"
+             viewBox="0 0 40 40" style="enable-background:new 0 0 40 40;" xml:space="preserve">
+            <style type="text/css">
+                .st0 {
+                    fill: none;
+                    stroke: #ffffff;
+                    stroke-width: 4;
+                    stroke-miterlimit: 10;
+                }
+            </style>
+            <g>
+                <polyline class="st0" points="0,0 20,20 0,40 	"/>
+            </g>
+        </svg>
+    </div>
+
+    <div id="centerWrap">
+        <img id="imgBig" class="noselect" src="{{ image_urls[0] }}">
+        <p id="subtext"></p>
+    </div>
+
+    <div id="right" class="arrow">
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+             x="0px" y="0px"
+             viewBox="0 0 40 40" style="enable-background:new 0 0 40 40;" xml:space="preserve">
+            <style type="text/css">
+                .st0 {
+                    fill: none;
+                    stroke: #ffffff;
+                    stroke-width: 4;
+                    stroke-miterlimit: 10;
+                }
+            </style>
+            <g>
+                <polyline class="st0" points="0,0 20,20 0,40 	"/>
+            </g>
+        </svg>
+    </div>
+</div>
+
+{% if language == "eng" %}
+
+{% for comment in image_comments %}
+    <p style="display: none" class="imgComment">{{ comment[1] }}</p>
+{% endfor %}
+
+{% else %}
+    {% for comment in image_comments %}
+        <p style="display: none" class="imgComment">{{ comment[2] }}</p>
+    {% endfor %}
+{% endif %}
+
+<div class="site-concent">
+
+    <div id="fade_out"></div>
+
+    <div class="row">
+        <!--    project pictures       -->
+        {% if current_proj[1] != "-" %}
+        <div class="col-xl-12">
+            <h2 class="projectsite_project_ttl prcssdf">
+            {% if language == "eng" %}
+                {{ current_proj[0] }}
+                {% else if language == "de" %}
+                {{ current_proj[5] }}
+                {% endif %}
+            </h2>
+        </div>
+        {% endif %}
+        <div class="col-xl-6">
+            <div class="project_picture_panel">
+                <img class="popImage" style="width: 100%" src="/static/projects/{{ current_proj[6] }}/{{ image_urls[0] }}">
+                <div class="row" style="padding: 8px 15px">
+                    {% for pic in image_urls %}
+                    {% if pic != image_urls[0] %}
+                    <div>
+                        <img class="img-thumbnail popImage"
+                             style=" opacity: 50%; border: 0 solid white; padding: 10px 10px 0 0; height: 70px"
+                             src="/static/projects/{{ current_proj[6] }}/{{ pic }}">
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!--    project description and video       -->
+        <div class="col-xl-6 project-text">
+            <p>
+                {% if language == "eng" %}
+                    {{ current_proj[1]|safe }}
+                {% else if language == "de" %}
+                    {{ current_proj[2]|safe }}
+                {% endif %}
+            </p>
+            <div class="project-video">
+                {{ current_proj[3]|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/fullscreen.js" type="text/javascript"></script>
+
+
+{% include "footer.html" %}
+

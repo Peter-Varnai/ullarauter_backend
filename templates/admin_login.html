@@ -1,0 +1,22 @@
+{% include "head.html" %}
+
+<form action="{{ url_for('creat_project') }}" method="POST" name="Create Project">
+    {{ create_form.csrf_token }}
+    {{ create_form.title.label }}<br>
+    {{ create_form.title }}<br>
+    {{ create_form.photo.label }}<br>
+    {{ create_form.photo }}<br>
+    {{ create_form.video.label }}<br>
+    {{ create_form.video }}<br>
+    {{ create_form.description.label }}<br>
+
+    {{ ckeditor.load() }}
+    {{ ckeditor.config(name='description') }}
+    {{ create_form.description }}<br>
+
+    {{ create_form.submit1 }}
+</form>
+
+
+
+{% include "footer.html" %}

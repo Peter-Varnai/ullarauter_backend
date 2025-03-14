@@ -1,0 +1,11 @@
+{% include "head.html" %}
+{% include "sidebar.html" %}
+
+<form method="POST" enctype="multipart/form-data">
+    {{ upload_form.csrf_token }}
+    {{ upload_form.photo }}
+    {{ upload_form.submit }}
+    {% for error in upload_form.photo.errors %}
+    <span style="color: red;">[{{ error }}]</span>
+    {% endfor %}
+</form>
