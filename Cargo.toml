@@ -21,3 +21,4 @@ mime = "0.3.17"
 lazy_static = "1.5.0"
 # tokio = { verison = "1.0", features = ["time"] }
 tokio = { version = "1.0", features = ["time"] }
+thiserror = "2.0.12"

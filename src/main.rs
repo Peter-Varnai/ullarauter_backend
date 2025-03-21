@@ -4,7 +4,7 @@ mod handlers;
 mod services;
 mod helpers;
 mod cache;
-
+mod errors;
 
 
 use actix_files::Files;

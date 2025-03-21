@@ -1,15 +1,17 @@
 #[warn(unreachable_code)]
 #[warn(unused_assignments)]
-use actix_web::{Responder,  get, post, HttpResponse, web::{Data, Path, Json, Query}};
+use actix_web::{Responder,  get, post, HttpResponse, error, 
+            web::{Data, Path, Json, Query}};
 use sqlx::Row;
 use crate::models::AppState;
 use serde_json::{from_str, json};
 use rand::thread_rng;
 use crate::{models::{Index, AdminQuery, LoginTemplate, AdminTemplate, SetLangRequest,
-    Bio, Project, Contact},
+            Bio, Project, Contact},
             services::{extract_rows, db_get_projects, db_get_fp_projects,
             db_get_details, db_get_comments},            
             cache::{SIDEBAR_LOCK, BIO_EXHIBS_LOCK},
+            errors::{HandlerError}
             };
 use std::env;
 use actix_identity::{Identity};
@@ -20,7 +22,10 @@ use askama::Template;
 
 
 #[get("/")]
-pub async fn index(session: Session, state: Data<AppState>) -> impl Responder {
+pub async fn index(
+    session: Session, 
+    state: Data<AppState>
+    ) -> Result<HttpResponse, HandlerError> {
 
     let front_page_proj = db_get_fp_projects(&state.db).await;
 
@@ -29,7 +34,7 @@ pub async fn index(session: Session, state: Data<AppState>) -> impl Responder {
         if lang == "eng" {sidebar_html = SIDEBAR_LOCK.read().unwrap()["eng"].to_string();}
         else {sidebar_html = SIDEBAR_LOCK.read().unwrap()["de"].to_string();}
     } else {
-        session.insert("lang", "eng");
+        session.insert("lang", "eng")?;
         sidebar_html = SIDEBAR_LOCK.read().unwrap()["eng"].to_string();
     }
 
@@ -50,16 +55,22 @@ pub async fn index(session: Session, state: Data<AppState>) -> impl Responder {
         fp: fp_picture,
         fp_url: format!("/static/front_pages/{}/{}", fp_picture[3], fp_picture[0]),
     };
+    
+    let html = index_template.render()?;
 
-    match index_template.render() {
-        Ok(html) => HttpResponse::Ok().body(html),
-        Err(_) => HttpResponse::InternalServerError().body("Failed to render index template.")
-    }
+    Ok(HttpResponse::Ok().content_type("text/html").body(html))
+    // match index_template.render() {
+    //     Ok(html) => HttpResponse::Ok().body(html),
+    //     Err(_) => HttpResponse::InternalServerError().body("Failed to render index template.")
+    // }
 }
 
 
 #[get("/contact")]
-pub async fn contact(session: Session,state: Data<AppState>) -> impl Responder {
+pub async fn contact(
+    session: Session,
+    state: Data<AppState>
+    ) -> Result<HttpResponse, HandlerError> {
 
     let projects = db_get_projects(&state.db); 
     let p_details_future = db_get_details(&state.db);
@@ -73,10 +84,10 @@ pub async fn contact(session: Session,state: Data<AppState>) -> impl Responder {
         }
         else {
             sidebar_html = SIDEBAR_LOCK.read().unwrap()["de"].to_string();
-             language = "de".to_string();
+            language = "de".to_string();
         }
     } else {
-        session.insert("lang", "eng");
+        session.insert("lang", "eng")?;
         language = "eng".to_string();
         sidebar_html = SIDEBAR_LOCK.read().unwrap()["eng"].to_string();
     }
@@ -85,7 +96,7 @@ pub async fn contact(session: Session,state: Data<AppState>) -> impl Responder {
 
     let cv_address_eng = &p_details[3];
     let cv_address_de = &p_details[4];
-    
+
     let contact_template = Contact {
         base_url: env::var("BASE_URL").unwrap_or("http://127.0.0.1:8080".to_string()),
         sidebar_html,
@@ -94,15 +105,17 @@ pub async fn contact(session: Session,state: Data<AppState>) -> impl Responder {
         cv_address_de,
     };
 
-    match contact_template.render() {
-        Ok(html) => HttpResponse::Ok().body(html),
-        Err(_) => HttpResponse::InternalServerError().body("Failed to render contact template.")
-    }
+    let html = contact_template.render()?;
+    
+    Ok(HttpResponse::Ok().body(html))
 }
 
 
 #[get("/bio")]
-pub async fn bio(session: Session,state: Data<AppState>) -> impl Responder {
+pub async fn bio(
+    session: Session,
+    state: Data<AppState>
+    ) ->  Result<HttpResponse, HandlerError> {
 
     let projects = db_get_projects(&state.db);
     let p_details_future = db_get_details(&state.db);
@@ -120,7 +133,7 @@ pub async fn bio(session: Session,state: Data<AppState>) -> impl Responder {
              language = "de".to_string();
         }
     } else {
-        session.insert("lang", "eng");
+        session.insert("lang", "eng")?;
         language = "eng".to_string();
         sidebar_html = SIDEBAR_LOCK.read().unwrap()["eng"].to_string();
     }
@@ -136,15 +149,18 @@ pub async fn bio(session: Session,state: Data<AppState>) -> impl Responder {
         pfp_url: &p_details[2],
     };
 
-    match bio_template.render() {
-        Ok(html) => HttpResponse::Ok().body(html),
-        Err(_) => HttpResponse::InternalServerError().body("Failed to render bio template.")
-    }
+    let html = bio_template.render()?;
+
+    Ok(HttpResponse::Ok().content_type("text/html").body(html))
 }
 
 
 #[get("/project/{project}")]
-pub async fn project(session: Session, project: Path<String>, state: Data<AppState>) -> impl Responder {
+pub async fn project(
+    session: Session, 
+    project: Path<String>, 
+    state: Data<AppState>
+    ) -> Result<HttpResponse, HandlerError> {
     let id = project.into_inner();
 
     let mut sidebar_html = String::new();
@@ -159,7 +175,7 @@ pub async fn project(session: Session, project: Path<String>, state: Data<AppSta
              language = "de".to_string();
         }
     } else {
-        session.insert("lang", "eng");
+        session.insert("lang", "eng")?;
         language = "eng".to_string();
         sidebar_html = SIDEBAR_LOCK.read().unwrap()["eng"].to_string();
     }
@@ -172,7 +188,7 @@ pub async fn project(session: Session, project: Path<String>, state: Data<AppSta
         .expect("Project wasn't found")
         .clone();
 
-    let images: Vec<String> = from_str(&selected_project[4]).expect("failed to convert to json");
+    let images: Vec<String> = from_str(&selected_project[4])?;
     let comments = db_get_comments(&state.db, &selected_project[6]).await;
     let mut img_comm = Vec::new();
 
@@ -190,7 +206,7 @@ pub async fn project(session: Session, project: Path<String>, state: Data<AppSta
     }
 
 
-    let pic_urls = from_str(&*selected_project[4]).expect("Failed to convert to JSON");
+    let pic_urls = from_str(&*selected_project[4])?;
 
 
     let project_template = Project {
@@ -206,16 +222,18 @@ pub async fn project(session: Session, project: Path<String>, state: Data<AppSta
     // TODO: currently project urls can contain spaces, a mechanism
     // need to be implemented that replaces spaces with "_" and
     // without breaking the project querying
+    
+    let html = project_template.render()?;
 
-    match project_template.render() {
-        Ok(html) => HttpResponse::Ok().content_type("text/html").body(html),
-        Err(_) => HttpResponse::InternalServerError().body("Failed to render picture template.")
-    }
+    Ok(HttpResponse::Ok().content_type("text/html").body(html))
 }
  
 
 #[post("/set_language")]
-async fn set_language(lang: Json<SetLangRequest>, session: Session) -> impl Responder {
+async fn set_language(
+    lang: Json<SetLangRequest>, 
+    session: Session
+    ) -> HttpResponse {
     println!("lang change called");
     session.insert("lang", lang.language.clone()).unwrap();
     HttpResponse::Ok().body("finished") 
