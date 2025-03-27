@@ -153,16 +153,16 @@ pub fn extract_rows(
 }
 
 
-// pub fn extract_row(
-//     raw_data: SqliteRow,
-//     keys: Vec<&str>,
-// ) -> Vec<String> {
-//     let mut extract: Vec<String> = Vec::new();
-//
-//     for key in &keys {
-//         extract.push(raw_data.get(key));
-//     }
-//     extract
-// }
+pub fn extract_row(
+    raw_data: SqliteRow,
+    keys: Vec<&str>,
+) -> Vec<String> {
+    let mut extract: Vec<String> = Vec::new();
+
+    for key in &keys {
+        extract.push(raw_data.get(key));
+    }
+    extract
+}
 
 

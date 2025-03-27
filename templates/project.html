@@ -60,7 +60,7 @@
     </div>
 </div>
 
-{% if language == "eng" %}
+{% if lang == "eng" %}
 
 {% for comment in image_comments %}
     <p style="display: none" class="imgComment">{{ comment[1] }}</p>
@@ -81,9 +81,9 @@
         {% if current_proj[1] != "-" %}
         <div class="col-xl-12">
             <h2 class="projectsite_project_ttl prcssdf">
-            {% if language == "eng" %}
+            {% if lang == "eng" %}
                 {{ current_proj[0] }}
-                {% else if language == "de" %}
+                {% else if lang == "de" %}
                 {{ current_proj[5] }}
                 {% endif %}
             </h2>
@@ -109,9 +109,9 @@
         <!--    project description and video       -->
         <div class="col-xl-6 project-text">
             <p>
-                {% if language == "eng" %}
+                {% if lang == "eng" %}
                     {{ current_proj[1]|safe }}
-                {% else if language == "de" %}
+                {% else if lang == "de" %}
                     {{ current_proj[2]|safe }}
                 {% endif %}
             </p>

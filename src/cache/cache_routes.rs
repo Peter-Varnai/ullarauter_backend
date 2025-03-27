@@ -6,6 +6,7 @@ use lazy_static::lazy_static;
 
 lazy_static! {
     pub static ref SIDEBAR_LOCK: RwLock<HashMap<String, String>> = RwLock::new(HashMap::new());
+    // pub static ref SIDEBAR_LOCK: RwLock<HashMap<&'static str, &'static str>> = RwLock::new(HashMap::new());
 }
 
 

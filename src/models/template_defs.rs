@@ -30,7 +30,7 @@ pub struct SidebarElement_de_html<'a> {
 #[derive(Template, Serialize)]
 #[template(path = "index.html")]
 pub struct Index<'a> {
-    pub sidebar_html: String,
+    pub sidebar_html: &'a String,
     // pub current_exhib: Vec<Vec<String>>,
     pub fp: &'a Vec<String>,
     pub fp_url: String,
@@ -40,10 +40,10 @@ pub struct Index<'a> {
 #[derive(Template, Serialize)]
 #[template(path = "contact.html")]
 pub struct Contact<'a> {
-    pub sidebar_html: String,
+    pub sidebar_html: &'a String,
     pub cv_address_eng: &'a String,
     pub cv_address_de: &'a String,
-    pub language: String,
+    pub lang: String,
     pub base_url: String, 
 }
 
@@ -58,26 +58,26 @@ pub struct Bio_Exhibs_html<> {
 #[derive(Template, Serialize)]
 #[template(path = "bio.html")]
 pub struct Bio<'a> {
-    pub sidebar_html: String,
-    pub exhibs_html: String,
+    pub sidebar_html: &'a String,
+    pub exhibs_html: &'a String,
     // pub all_exhibitions: Vec<Vec<Vec<String>>>,
     pub bio_eng: &'a String,
     pub bio_de: &'a String,
     pub pfp_url: &'a String,
-    pub language: String,
+    pub lang: String,
     // pub base_url: String, 
 }
 
 
 #[derive(Template, Serialize)]
 #[template(path = "project.html")]
-pub struct Project<> {
-    pub sidebar_html: String,
+pub struct Project<'a> {
+    pub sidebar_html:&'a String,
     pub project_title: String,
     pub image_urls: Vec<String>,
     pub image_comments: Vec<Vec<String>>,
     pub current_proj: Vec<String>,
-    pub language: String,
+    pub lang: String,
 }
 
 

@@ -8,7 +8,7 @@ mod errors;
 
 
 use actix_files::Files;
-use actix_identity::{IdentityMiddleware};
+use actix_identity::IdentityMiddleware;
 use actix_session::{SessionMiddleware, storage::CookieSessionStore};
 use actix_web::{web::Data, rt::spawn, cookie::Key, App, HttpServer};
 use tokio::time::{Duration, sleep};
@@ -48,17 +48,14 @@ async fn main() -> std::io::Result<()> {
             .wrap(IdentityMiddleware::default()) // Manage identity for login/logout
             .wrap(SessionMiddleware::new(
                 CookieSessionStore::default(),
-                secret_key.clone(),
-            ))
-            .service(Files::new("/static", "./static")
-                // .show_files_listing()
-                )
+                secret_key.clone()))
+            .service(Files::new("/static", "./static"))
             .app_data(Data::new(AppState {
                 db: pool.clone(),
             }))
             .configure(public_routes)
             .configure(admin_routes)
-    })
+        })
         .bind(("127.0.0.1", 8080))?
         .run()
         .await

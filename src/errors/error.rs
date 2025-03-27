@@ -3,6 +3,7 @@ use askama::Error as AskamaError;
 use std::fmt;
 use actix_session::SessionInsertError;
 use serde_json::Error as JsonError;
+use sqlx::Error as SqlxError;
 
 
 #[derive(Debug)]
@@ -11,6 +12,7 @@ pub enum HandlerError {
     Askama(AskamaError),
     Session(SessionInsertError),
     Json(JsonError),
+    Sqlx(SqlxError),
 }
 
 
@@ -21,6 +23,7 @@ impl fmt::Display for HandlerError {
             HandlerError::Askama(err) => write!(f, "Askama error: {}", err),
             HandlerError::Session(err) => write!(f, "Session error: {}", err),
             HandlerError::Json(err) => write!(f, "Json string conversion error: {}", err),
+            HandlerError::Sqlx(err) => write!(f, "Sqlx error: {}", err),
         }
     }
 }
@@ -36,6 +39,8 @@ impl ResponseError for HandlerError {
                 HttpResponse::InternalServerError().body(format!("Insert Session error: {}", err)),
             HandlerError::Json(err) =>
                 HttpResponse::InternalServerError().body(format!("Json conversion error: {}", err)),
+             HandlerError::Sqlx(err) =>
+                HttpResponse::InternalServerError().body(format!("Sqlx query/insert error: {}", err)),
         }
     }
 }
@@ -66,3 +71,13 @@ impl From<JsonError> for HandlerError {
         HandlerError::Json(err)
     }
 }
+
+impl From<SqlxError> for HandlerError {
+    fn from(err: SqlxError) -> Self {
+        HandlerError::Sqlx(err)
+    }
+}
+
+
+
+

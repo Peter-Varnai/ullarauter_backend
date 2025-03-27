@@ -1,9 +1,10 @@
 #![allow(unreachable_code)]
 use crate::{
     models::{AppState, BioForm, CvUploadForm, ExhibitionForm, DeleteExhibitionRequest, 
-        DeleteProjectRequest, DeleteBackgroundRequest, ImgCommentForm, LoginForm},
-    cache::{update_sidebar_cashe, update_bio_exhibs_cache, update_sidebar_exhibs_cache}};
-use crate::services::{new_id, delete_folder, delete_entry, extract_rows, delete_file, process_multiform};
+            DeleteProjectRequest, DeleteBackgroundRequest, ImgCommentForm, LoginForm},
+    cache::{update_sidebar_cashe, update_bio_exhibs_cache, update_sidebar_exhibs_cache},
+    services::{new_id, delete_folder, delete_entry, extract_rows, delete_file, process_multiform},
+    errors::HandlerError};
 use actix_web::{Result, web::{Path as Ax_Path, Data, Form, Json}};
 use actix_web::{HttpResponse, post, Responder, get, HttpRequest, HttpMessage};
 use actix_multipart::Multipart;
@@ -38,19 +39,13 @@ async fn create_project(
     state: Data<AppState>, 
     payload: Multipart,
     identity: Option<Identity>,
-    ) -> impl Responder {
-
+) -> Result<HttpResponse, HandlerError> {
+    
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
-
 
     // TODO: get rid of the pictures folder column in db by making the ID of the row be the name of the
     // folder where the project pictures are stored. Projects made with this route already create their pictures
@@ -60,12 +55,10 @@ async fn create_project(
     // exhibitions at the moment store dates as %Y%m%d, projects do: %Y-%m-%d
 
     let id = new_id(&state, "projects").await.to_string();
-    println!("{}", id);
     let upload_dir: String = format!("./static/projects/{}", id);
 
     let form_data = process_multiform(payload, upload_dir).await;
-    println!("form processed");
-    match sqlx::query(
+    sqlx::query(
         "INSERT INTO projects (id, title_eng, title_de, text_eng, text_de, video, date, \
         pictures_folder, pictures) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)")
         .bind(&id)
@@ -78,14 +71,11 @@ async fn create_project(
         .bind(&id)
         .bind(&form_data.get("filenames"))
         .execute(&state.db)
-        .await
-    {
-        Ok(_) => {
-            update_sidebar_cashe(&state.db).await;
-            HttpResponse::Found().append_header(("Location", "/admin")).finish()
-        },
-        Err(_) => HttpResponse::InternalServerError().finish()
-    }
+        .await?;
+
+    update_sidebar_cashe(&state.db).await;
+
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
@@ -94,20 +84,12 @@ async fn upload_background(
     state: Data<AppState>, 
     payload: Multipart,
     identity: Option<Identity>,
-    ) -> impl Responder {
-
+) -> Result<HttpResponse, HandlerError> {
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
-
-
 
     let id = new_id(&state, "front_page_projects").await.to_string();
     let upload_dir: String = format!("./static/front_pages/{}", id);
@@ -118,7 +100,7 @@ async fn upload_background(
         .map(|s| &s[2..s.len() - 2])
         .expect("failed to retrieve profile picture"); 
 
-    match sqlx::query(
+   sqlx::query(
         "INSERT INTO front_page_projects (id, title_eng, title_de, pictures_folder, image) VALUES ($1, $2, $3, $4, $5)")
         .bind(&id)
         .bind(form_data.get("title_eng"))
@@ -126,11 +108,9 @@ async fn upload_background(
         .bind(&id)
         .bind(file_name)
         .execute(&state.db)
-        .await
-    {
-        Ok(_) => HttpResponse::Found().append_header(("Location", "/admin")).finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
+        .await?;
+ 
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
@@ -139,22 +119,17 @@ async fn add_exhibition(
     state: Data<AppState>, 
     form: Form<ExhibitionForm>,
     identity: Option<Identity>,
-    ) -> impl Responder {
+    ) -> Result<HttpResponse, HandlerError> {
   
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
-
+ 
     let form_data = form.into_inner();
 
-    match sqlx::query(
+    sqlx::query(
         "INSERT INTO exhibitions (id, title, title_de, fromm, till, location, link) VALUES ($1, $2, $3, $4, $5, $6, $7)")
         .bind(new_id(&state, "exhibitions").await.to_string())
         .bind(form_data.title_eng)
@@ -164,16 +139,13 @@ async fn add_exhibition(
         .bind(form_data.location)
         .bind(form_data.link)
         .execute(&state.db)
-        .await
-    {
-        Ok(_) => {
-            update_sidebar_exhibs_cache(&state.db).await;
-            update_bio_exhibs_cache(&state.db).await;
-            update_sidebar_cashe(&state.db).await;
-            HttpResponse::Found().append_header(("Location", "/admin")).finish()
-        },
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
+        .await?;
+
+    update_sidebar_exhibs_cache(&state.db).await;
+    update_bio_exhibs_cache(&state.db).await;
+    update_sidebar_cashe(&state.db).await;
+
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
@@ -182,25 +154,18 @@ async fn delete_exhibition(
     state: Data<AppState>, 
     form: Json<DeleteExhibitionRequest>,
     identity: Option<Identity>
-    ) -> impl Responder {
+    ) -> Result<HttpResponse, HandlerError> {
   
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => {
-                update_sidebar_exhibs_cache(&state.db).await;
-                return HttpResponse::Ok().body(rendered)},
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
     delete_entry(&state.db, "exhibitions", &form.id).await;
     update_bio_exhibs_cache(&state.db).await;
 
-    HttpResponse::Found().append_header(("Location", "/admin")).finish()
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
@@ -209,31 +174,27 @@ async fn delete_background(
     state: Data<AppState>, 
     form: Json<DeleteBackgroundRequest>,
     identity: Option<Identity>
-    ) -> impl Responder {
+    ) -> Result<HttpResponse, HandlerError> {
   
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
     let path = sqlx::query("SELECT pictures_folder, image FROM front_page_projects WHERE id = $1")
         .bind(&form.id)
         .fetch_one(&state.db)
-        .await
-        .expect("Failed to fetch background file location");
+        .await?;
 
     let pictures_folder: String = path.get("pictures_folder");
     let image: String = path.get("image");
 
     delete_file(format!("/front_pages/{}/{}", pictures_folder, image));
 
-    delete_entry(&state.db, "front_page_projects", &form.id).await
+    delete_entry(&state.db, "front_page_projects", &form.id).await;
+
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
@@ -242,25 +203,19 @@ async fn delete_project(
     state: Data<AppState>, 
     form: Json<DeleteProjectRequest>,
     identity: Option<Identity>
-    ) -> impl Responder {
-   
+) -> Result<HttpResponse, HandlerError> {
+  
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
-
 
     let path = sqlx::query("SELECT pictures_folder FROM projects WHERE id = $1")
         .bind(&form.id)
         .fetch_one(&state.db)
-        .await
-        .expect("Failed to fetch pictures_folder to delete");
+        .await?;
+
     let pictures_folder: String = path.get("pictures_folder");
     let folder_path: String = format!("./static/projects/{}", pictures_folder);
     println!("project folder to delete: {}", &folder_path);
@@ -270,7 +225,7 @@ async fn delete_project(
     
     delete_entry(&state.db, "projects", &form.id).await;
 
-    HttpResponse::Found().append_header(("Location", "/admin")).finish()
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 } 
 
 
@@ -279,23 +234,18 @@ async fn update_pfp(
     state: Data<AppState>, 
     payload: Multipart,
     identity: Option<Identity>
-    ) -> impl Responder {
-   
+) -> Result<HttpResponse, HandlerError> {
+  
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
     let pfp_query = sqlx::query("SELECT pfp_address FROM personal_details")
         .fetch_one(&state.db)
-        .await
-        .expect("Failed to fetch projects from db");
+        .await?;
+
     let pfp_address: String = pfp_query.get("pfp_address");
 
     let path = format!("/personal_details/{}", pfp_address);
@@ -308,17 +258,13 @@ async fn update_pfp(
         .map(|s| &s[2..s.len() - 2])
         .expect("failed to retrieve profile picture");    
 
-    match sqlx::query("UPDATE personal_details SET pfp_address = $1 WHERE id = 1")
+    sqlx::query("UPDATE personal_details SET pfp_address = $1 WHERE id = 1")
         .bind(file_name)
         .execute(&state.db)
-        .await
-    {
-        Ok(_) => {
-            update_sidebar_cashe(&state.db);
-            HttpResponse::Found().append_header(("Location", "/admin")).finish()
-        },
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
+        .await?;
+
+    update_sidebar_cashe(&state.db);
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
@@ -327,30 +273,23 @@ async fn update_cv(
     form: Form<CvUploadForm>, 
     state: Data<AppState>,
     identity: Option<Identity>
-    ) -> impl Responder {
- 
+) -> Result<HttpResponse, HandlerError> {
+  
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
     let form_data = form.into_inner();
 
-    match sqlx::query("UPDATE personal_details SET cv_eng_address = $1, cv_de_address = $2 WHERE id = 1")
+    sqlx::query("UPDATE personal_details SET cv_eng_address = $1, cv_de_address = $2 WHERE id = 1")
         .bind(form_data.cv_eng_address)
         .bind(form_data.cv_de_address)
         .execute(&state.db)
-        .await
-    {
-        Ok(_) => HttpResponse::Found().append_header(("Location", "/admin")).finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
+        .await?;
+
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
@@ -359,30 +298,23 @@ async fn update_bio(
     form: Form<BioForm>, 
     state: Data<AppState>,
     identity: Option<Identity>
-    ) -> impl Responder {
-    
+) -> Result<HttpResponse, HandlerError> {
+  
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
     let form_data = form.into_inner();
 
-    match sqlx::query("UPDATE personal_details SET bio_eng = $1, bio_de = $2 WHERE id = 1")
+    sqlx::query("UPDATE personal_details SET bio_eng = $1, bio_de = $2 WHERE id = 1")
         .bind(form_data.bio_eng)
         .bind(form_data.bio_de)
         .execute(&state.db)
-        .await
-    {
-        Ok(_) => HttpResponse::Found().append_header(("Location", "/admin")).finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
+        .await?;
+  
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
@@ -392,23 +324,18 @@ async fn get_project(
     project_id: Ax_Path<String>, 
     state: Data<AppState>,
     identity: Option<Identity>
-    ) -> impl Responder {
+) -> Result<HttpResponse, HandlerError> {
   
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
     let projects_query = sqlx::query("SELECT * FROM projects")
         .fetch_all(&state.db)
-        .await
-        .expect("Failed to fetch projects from db");
+        .await?;
+
     let projects_columns = vec!["title_eng", "text_eng", "text_de", "video", "pictures",
                                 "title_de", "pictures_folder", "date", "id"];
     // 0:"title_eng", 1:"text_eng", 2:"text_de", 3:"video", 4:"pictures",
@@ -418,9 +345,8 @@ async fn get_project(
     let project_id = project_id.into_inner();
     let project = projects.iter().find(|p| p[8] == project_id);
 
-    HttpResponse::Ok().json(project)
+    Ok(HttpResponse::Ok().json(project))
 }
-
 
 #[post("/add_comment")]
 async fn add_image_comment(
