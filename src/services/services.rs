@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use crate::helpers::{return_fieldnames, return_filename};
+use crate::{helpers::{return_fieldnames, return_filename},
+            errors::HandlerError};
 use actix_web::HttpResponse;
 use serde_json::to_string;
 use crate::models::AppState;
@@ -85,44 +86,52 @@ pub async fn upload_file(upload_dir: &String, filenames_arr: &mut Vec<String>, m
 }
 
 
-
 pub async fn delete_entry(
     db: &sqlx::SqlitePool,
     table: &str,
     id: &str,
-) -> HttpResponse {
+) -> Result<(), HandlerError> {
     let query = format!("DELETE FROM {} WHERE id = ?", table);
     
-    println!("{}", &query);
-    match sqlx::query(&query)
+    println!("deleting entry: {}", &query);
+    sqlx::query("DELETE FROM ? WHERE id = ?")
+        .bind(table)
         .bind(id)
         .execute(db)
-        .await
-    {
-        Ok(_) => HttpResponse::Found().append_header(("Location", "/admin")).finish(),
-        Err(_) => HttpResponse::InternalServerError().body(format!("Failed to delete entry from {}", table)),
-    }
+        .await?;
+
+    Ok(())
 }
 
 
-pub fn delete_file(
-    path: String
-) -> HttpResponse {
+pub async fn delete_img_comments(
+    db: &sqlx::SqlitePool,
+    folder_name: &str,
+) -> Result<(), HandlerError> {
+    println!("DELETEING image comments for folder: {}", folder_name);
+
+    sqlx::query("DELETE FROM image_comments WHERE pictures_folder = ?")
+        .bind(folder_name)
+        .execute(db)
+        .await?;
+
+    Ok(())
+}
+
+
+pub fn delete_file(path: String) -> Result<(), HandlerError> {
     let path = format!("./static{}", path);
     println!("removing file: {}", path);
-    match std::fs::remove_file(&path) {
-        Ok(_) => HttpResponse::Found().append_header(("Location", "/admin")).finish(),
-        Err(_) => HttpResponse::InternalServerError().body(format!("Failed to delete file {}", path)),
-    }
-}
+    std::fs::remove_file(&path)?;
+
+    Ok(())
+ }
 
 
-pub fn delete_folder(path:String) -> HttpResponse {
+pub fn delete_folder(path:String) -> Result<(), HandlerError>  {
     println!("deleting folder: {}", path);
-    match remove_dir_all(&path) {
-        Ok(_) => HttpResponse::Found().append_header(("Location", "/admin")).finish(),
-        Err(_) => HttpResponse::InternalServerError().body(format!("Failed to delete folder: {}", path))
-    }
+    remove_dir_all(&path)?; 
+    Ok(())
 }
 
 

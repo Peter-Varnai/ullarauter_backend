@@ -3,10 +3,12 @@ use crate::{
     models::{AppState, BioForm, CvUploadForm, ExhibitionForm, DeleteExhibitionRequest, 
             DeleteProjectRequest, DeleteBackgroundRequest, ImgCommentForm, LoginForm},
     cache::{update_sidebar_cashe, update_bio_exhibs_cache, update_sidebar_exhibs_cache},
-    services::{new_id, delete_folder, delete_entry, extract_rows, delete_file, process_multiform},
+    services::{new_id, delete_img_comments, delete_folder, delete_entry, extract_rows,
+    delete_file, process_multiform},
     errors::HandlerError};
-use actix_web::{Result, web::{Path as Ax_Path, Data, Form, Json}};
-use actix_web::{HttpResponse, post, Responder, get, HttpRequest, HttpMessage};
+// use actix_web::{Result, web::{Path as Ax_Path, Data, Form, Json}};
+use actix_web::{Result, web::{Path as Ax_Path, Data, Form, Json}, 
+                HttpResponse, put, post, delete, Responder, get, HttpRequest, HttpMessage};
 use actix_multipart::Multipart;
 use actix_identity::{Identity};
 use sqlx::Row;
@@ -119,7 +121,7 @@ async fn add_exhibition(
     state: Data<AppState>, 
     form: Form<ExhibitionForm>,
     identity: Option<Identity>,
-    ) -> Result<HttpResponse, HandlerError> {
+) -> Result<HttpResponse, HandlerError> {
   
     if identity.is_none() {
         let template = LoginTemplate;
@@ -149,12 +151,12 @@ async fn add_exhibition(
 }
 
 
-#[post("/delete_exhibition")]
+#[delete("/delete_exhibition")]
 async fn delete_exhibition(
     state: Data<AppState>, 
     form: Json<DeleteExhibitionRequest>,
     identity: Option<Identity>
-    ) -> Result<HttpResponse, HandlerError> {
+) -> Result<HttpResponse, HandlerError> {
   
     if identity.is_none() {
         let template = LoginTemplate;
@@ -162,19 +164,19 @@ async fn delete_exhibition(
         return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
-    delete_entry(&state.db, "exhibitions", &form.id).await;
+    delete_entry(&state.db, &form.id, "exhibitions").await?;
     update_bio_exhibs_cache(&state.db).await;
 
     Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
-#[post("/delete_background")]
+#[delete("/delete_background")]
 async fn delete_background(
     state: Data<AppState>, 
     form: Json<DeleteBackgroundRequest>,
     identity: Option<Identity>
-    ) -> Result<HttpResponse, HandlerError> {
+) -> Result<HttpResponse, HandlerError> {
   
     if identity.is_none() {
         let template = LoginTemplate;
@@ -192,13 +194,13 @@ async fn delete_background(
 
     delete_file(format!("/front_pages/{}/{}", pictures_folder, image));
 
-    delete_entry(&state.db, "front_page_projects", &form.id).await;
+    delete_entry(&state.db, "front_page_projects", &form.id).await?;
 
     Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
-#[post("/delete_project")]
+#[delete("/delete_project")]
 async fn delete_project(
     state: Data<AppState>, 
     form: Json<DeleteProjectRequest>,
@@ -217,14 +219,14 @@ async fn delete_project(
         .await?;
 
     let pictures_folder: String = path.get("pictures_folder");
-    let folder_path: String = format!("./static/projects/{}", pictures_folder);
+    let folder_path: String = format!("./static/projects/{}", &pictures_folder);
     println!("project folder to delete: {}", &folder_path);
     println!("project id to delete: {}", &form.id);
 
     delete_folder(folder_path);
     
-    delete_entry(&state.db, "projects", &form.id).await;
-
+    delete_entry(&state.db, "projects", &form.id).await?;
+    delete_img_comments(&state.db, &pictures_folder);
     Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 } 
 
@@ -293,7 +295,7 @@ async fn update_cv(
 }
 
 
-#[post("/update_bio")]
+#[put("/update_bio")]
 async fn update_bio(
     form: Form<BioForm>, 
     state: Data<AppState>,
@@ -347,6 +349,7 @@ async fn get_project(
 
     Ok(HttpResponse::Ok().json(project))
 }
+
 
 #[post("/add_comment")]
 async fn add_image_comment(

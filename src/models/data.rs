@@ -14,17 +14,6 @@ pub struct AppState {
     pub db: Pool<Sqlite>,
 }
 
-
-// #[derive(Serialize)]
-// pub struct SidebarConfig {
-//     pub all_projects: Vec<Vec<String>>,
-//     pub base_url: String,
-//     pub current_exhib: Vec<Vec<String>>,
-//     pub language: String,
-//     pub admin: bool,
-// }
-
-
 #[derive(Deserialize)]
 pub struct AdminQuery {
     pub edit_project: Option<String>,

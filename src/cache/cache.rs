@@ -41,7 +41,7 @@ pub async fn update_bio_exhibs_cache(db: &Pool<Sqlite>) {
 pub async fn update_sidebar_cashe(db: &Pool<Sqlite>) {
     let all_projects = db_get_projects(db).await;
     let base_url = env::var("BASE_URL").unwrap_or("http://127.0.0.1:8080".to_string());
-    let mut current_exhib = FRONTPAGE_EXHIBS.read().unwrap();
+    let current_exhib = FRONTPAGE_EXHIBS.read().unwrap();
 
     let rendered_eng = SidebarElement_eng_html {
         all_projects: &all_projects,

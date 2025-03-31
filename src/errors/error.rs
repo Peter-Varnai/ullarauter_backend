@@ -1,6 +1,6 @@
 use actix_web::{error::Error as ActixError, HttpResponse, ResponseError};
 use askama::Error as AskamaError;
-use std::fmt;
+use std::{fmt, io::Error as StdError};
 use actix_session::SessionInsertError;
 use serde_json::Error as JsonError;
 use sqlx::Error as SqlxError;
@@ -13,6 +13,7 @@ pub enum HandlerError {
     Session(SessionInsertError),
     Json(JsonError),
     Sqlx(SqlxError),
+    Std(StdError),
 }
 
 
@@ -23,6 +24,7 @@ impl fmt::Display for HandlerError {
             HandlerError::Askama(err) => write!(f, "Askama error: {}", err),
             HandlerError::Session(err) => write!(f, "Session error: {}", err),
             HandlerError::Json(err) => write!(f, "Json string conversion error: {}", err),
+            HandlerError::Std(err) => write!(f, "Standard library error: {}", err),
             HandlerError::Sqlx(err) => write!(f, "Sqlx error: {}", err),
         }
     }
@@ -33,6 +35,8 @@ impl ResponseError for HandlerError {
         match self {
             HandlerError::Actix(err) => 
                 err.error_response(),
+            HandlerError::Std(err) =>
+                HttpResponse::InternalServerError().body(format!("Standard library error: {}", err)),
             HandlerError::Askama(err) => 
                 HttpResponse::InternalServerError().body(format!("Template error: {}", err)),
             HandlerError::Session(err) => 
@@ -47,6 +51,12 @@ impl ResponseError for HandlerError {
 
 
 impl std::error::Error for HandlerError {}
+
+impl From<StdError> for HandlerError {
+    fn from(err: StdError) -> Self {
+        HandlerError::Std(err)
+    }
+}
 
 impl From<AskamaError> for HandlerError {
     fn from(err: AskamaError) -> Self {

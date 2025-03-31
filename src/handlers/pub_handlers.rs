@@ -2,13 +2,12 @@
 #[warn(unused_assignments)]
 use actix_web::{Responder,  get, post, HttpResponse,
             web::{Data, Path, Json, Query}};
-use sqlx::Row;
 use crate::models::AppState;
 use serde_json::{from_str, json};
 use rand::thread_rng;
 use crate::{models::{Index, AdminQuery, LoginTemplate, AdminTemplate, SetLangRequest,
             Bio, Project, Contact},
-            services::{extract_rows, extract_row, db_get_projects, db_get_fp_projects,
+            services::{db_get_projects, db_get_fp_projects,
             db_get_details, db_get_comments, db_get_project, db_get_exhibitions},            
             cache::{SIDEBAR_LOCK, BIO_EXHIBS_LOCK},
             errors::{HandlerError}
@@ -86,7 +85,7 @@ pub async fn contact(
 pub async fn bio(
     session: Session,
     state: Data<AppState>
-    ) ->  Result<HttpResponse, HandlerError> {
+) ->  Result<HttpResponse, HandlerError> {
 
     let p_details_future = db_get_details(&state.db);
     let exhibs_html = &BIO_EXHIBS_LOCK.read().unwrap();
@@ -116,7 +115,7 @@ pub async fn project(
     session: Session, 
     project: Path<String>, 
     state: Data<AppState>
-    ) -> Result<HttpResponse, HandlerError> {
+) -> Result<HttpResponse, HandlerError> {
     let id = project.into_inner();
   
     let lang = session.get::<String>("lang").unwrap().unwrap_or("eng".to_string());
@@ -165,7 +164,7 @@ pub async fn project(
 async fn set_language(
     lang: Json<SetLangRequest>, 
     session: Session
-    ) -> HttpResponse {
+) -> HttpResponse {
     println!("lang change called");
     session.insert("lang", lang.language.clone()).unwrap();
     HttpResponse::Ok().body("finished") 
@@ -216,7 +215,7 @@ async fn admin(
     let mut img_comm = vec![vec!["".to_string(); 5]; 8];
 
     if let Some(id) = &query.edit_project {
-        let edit_project = db_get_project(&state.db, id.to_string()).await;
+        edit_project = db_get_project(&state.db, id.to_string()).await;
         let comments = db_get_comments(&state.db, &edit_project[6]).await;
         let images: Vec<String> = from_str(&edit_project[4]).expect("failed to convert to json");
         img_comm = Vec::new();
@@ -241,7 +240,6 @@ async fn admin(
     let backgrounds = db_get_fp_projects(&state.db).await;
     let personal_details = db_get_details(&state.db).await;
 
-
     let template = AdminTemplate {
         projects,
         exhibitions,
@@ -255,25 +253,3 @@ async fn admin(
 
     Ok(HttpResponse::Ok().body(admin_rendered))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

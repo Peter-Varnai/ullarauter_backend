@@ -38,6 +38,7 @@
     </style>
     <script src="https://cdn.ckeditor.com/ckeditor5/34.1.0/classic/ckeditor.js"></script>
 </head>
+
 <body>
 <div class="container my-5">
     <h2 class="text-center mb-4">Admin Panel</h2>
@@ -163,14 +164,14 @@
 
         <!-- Bio Profile Picture -->
         <div class="tab-pane fade" id="bio" role="tabpanel" aria-labelledby="bio-tab">
-            <form action="/update_profile_picture" method="POST" enctype="multipart/form-data">
+            <form action="/update_profile_picture" method="PUT" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Profile Picture:</label>
                     <input value="{{ personal_details[2] }}" type="file" name="profile_pic" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Update Profile Picture</button>
             </form>
-            <form action="/update_bio" method="POST">
+            <form action="/update_bio" method="PUT">
                 <div class="form-group">
                     <label>Bio Text (eng):</label>
                     <textarea name="bio_eng" class="form-control ckeditor">{{ personal_details[0] }}</textarea>
@@ -198,10 +199,7 @@
             </form>
         </div>
 
-
         <!--        EDIT PROJECT SECTION        -->
-
-
         <div class="tab-pane fade" id="edit-project" role="tabpanel" aria-labelledby="edit-project-tab">
             <h3>Edit Projects</h3>
             <div class="form-section">
@@ -215,7 +213,7 @@
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu">
                         {% for project in projects %}
                         <li>
-                            <a class="dropdown-item" href="/admin?edit_project={{ project[1] }}">{{ project[0] }}</a>
+                            <a class="dropdown-item" href="/admin?edit_project={{ project[8] }}">{{ project[0] }}</a>
                         </li>
                         {% endfor %}
                     </ul>
@@ -241,7 +239,7 @@
                 </div>
                 <div class="form-section">
                     <label>Video Embed Code:</label>
-                    <input value="{{ edit_project[3] }}" type="text" name="video" class="form-control" required>
+                    <input value="{{ edit_project[3] }}" type="text" name="video" class="form-control">
                 </div>
                 <div class="form-section">
                     <label>Project Text (eng):</label>
@@ -301,7 +299,7 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             {{ project[0] }}
                             <button class="btn btn-danger btn-sm"
-                                    onclick="deleteEntry('{{ project[1] }}', '/delete_project')">
+                                    onclick="deleteEntry('{{ project[8] }}', '/delete_project')">
                                 Delete
                             </button>
                         </li>
@@ -316,7 +314,7 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             {{ background[1] }}
                             <button class="btn btn-danger btn-sm"
-                                    onclick="deleteEntry('{{ background[4] }}', '/delete_background')">
+                                    onclick="deleteEntry('{{ background[3] }}', '/delete_background')">
                                 Delete
                             </button>
                         </li>
@@ -355,7 +353,7 @@
     function deleteEntry(entryId, query) {
         console.log(entryId)
         fetch(query, {
-            method: 'POST',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -366,7 +364,8 @@
                     alert('Entry deleted successfully!');
                     location.reload();
                 } else {
-                    alert('Failed to delete entry.' );
+                    alert('Deleted directory.' );
+                    location.reload();
                 }
             })
             .catch(error => {
