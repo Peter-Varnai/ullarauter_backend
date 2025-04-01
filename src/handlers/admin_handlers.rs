@@ -1,4 +1,3 @@
-#![allow(unreachable_code)]
 use crate::{
     models::{AppState, BioForm, CvUploadForm, ExhibitionForm, DeleteExhibitionRequest, 
             DeleteProjectRequest, DeleteBackgroundRequest, ImgCommentForm, LoginForm},
@@ -192,7 +191,7 @@ async fn delete_background(
     let pictures_folder: String = path.get("pictures_folder");
     let image: String = path.get("image");
 
-    delete_file(format!("/front_pages/{}/{}", pictures_folder, image));
+    delete_file(format!("/front_pages/{}/{}", pictures_folder, image))?;
 
     delete_entry(&state.db, "front_page_projects", &form.id).await?;
 
@@ -223,10 +222,10 @@ async fn delete_project(
     println!("project folder to delete: {}", &folder_path);
     println!("project id to delete: {}", &form.id);
 
-    delete_folder(folder_path);
+    delete_folder(folder_path)?;
     
     delete_entry(&state.db, "projects", &form.id).await?;
-    delete_img_comments(&state.db, &pictures_folder);
+    delete_img_comments(&state.db, &pictures_folder).await?;
     Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 } 
 
@@ -251,7 +250,7 @@ async fn update_pfp(
     let pfp_address: String = pfp_query.get("pfp_address");
 
     let path = format!("/personal_details/{}", pfp_address);
-    delete_file(path);
+    delete_file(path)?;
     
     let upload_dir: String = format!("./static/personal_details");
     let form_data = process_multiform(payload, upload_dir).await;
@@ -265,7 +264,7 @@ async fn update_pfp(
         .execute(&state.db)
         .await?;
 
-    update_sidebar_cashe(&state.db);
+    update_sidebar_cashe(&state.db).await;
     Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
@@ -363,9 +362,7 @@ async fn add_image_comment(
         let template = LoginTemplate;
         return match template.render() {
             Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => {
-                return HttpResponse::InternalServerError().finish()
-            }
+            Err(_) => return HttpResponse::InternalServerError().finish(),
         }
     }
 

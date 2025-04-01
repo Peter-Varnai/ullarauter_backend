@@ -6,7 +6,6 @@ use sqlx::{Pool, Sqlite};
 use std::collections::{HashMap, BTreeMap};
 use crate::cache::{ BIO_EXHIBS_LOCK, SIDEBAR_LOCK, FRONTPAGE_EXHIBS };
 use askama::Template;
-use std::env;
 use chrono::{NaiveDate, Utc};
 
 
@@ -40,18 +39,18 @@ pub async fn update_bio_exhibs_cache(db: &Pool<Sqlite>) {
 
 pub async fn update_sidebar_cashe(db: &Pool<Sqlite>) {
     let all_projects = db_get_projects(db).await;
-    let base_url = env::var("BASE_URL").unwrap_or("http://127.0.0.1:8080".to_string());
+    // let base_url = env::var("BASE_URL").unwrap_or("http://127.0.0.1:8080".to_string());
     let current_exhib = FRONTPAGE_EXHIBS.read().unwrap();
 
     let rendered_eng = SidebarElement_eng_html {
         all_projects: &all_projects,
-        base_url: &base_url,
+        // base_url,
         current_exhib: &current_exhib,
     }.render().unwrap();
 
     let rendered_de = SidebarElement_de_html {
         all_projects: &all_projects,
-        base_url: &base_url,
+        // base_url,
         current_exhib: &current_exhib, 
     }.render().unwrap();
 
@@ -71,11 +70,6 @@ pub async fn update_sidebar_exhibs_cache(db: &Pool<Sqlite>) {
 
     let now = Utc::now().date_naive();
     let mut current_exhib: Vec<Vec<String>> = Vec::new();
-
-    // TODO: at the moment, the exhibitions list on the front page are calculated at cache
-    // building time, it needs to be separated so the exhibitions which are out of date
-    // are not displayed along with the rest of the sidebar.
-    //
 
     for exhib in &mut exhibitions {
         let naive_till = NaiveDate::parse_from_str(&mut exhib[2], "%Y%m%d").expect("Exhibition date conversion failed");

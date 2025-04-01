@@ -12,7 +12,6 @@ use crate::{models::{Index, AdminQuery, LoginTemplate, AdminTemplate, SetLangReq
             cache::{SIDEBAR_LOCK, BIO_EXHIBS_LOCK},
             errors::{HandlerError}
             };
-use std::env;
 use actix_identity::{Identity};
 use actix_session::Session;
 use rand::Rng;
@@ -68,7 +67,7 @@ pub async fn contact(
     let cv_address_de = &p_details[4];
 
     let contact_template = Contact {
-        base_url: env::var("BASE_URL").unwrap_or("http://127.0.0.1:8080".to_string()),
+        // base_url: &state.url,
         sidebar_html,
         cv_address_eng ,
         lang,

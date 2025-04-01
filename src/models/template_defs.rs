@@ -9,20 +9,22 @@ pub struct SidebarExhibs {
     pub current_exhib: Vec<Vec<String>>,    
 }
 
+#[allow(non_camel_case_types)]
 #[derive(Template, Serialize)]
 #[template(path="sidebar_eng.html")]
 pub struct SidebarElement_eng_html<'a> {
     pub all_projects: &'a Vec<Vec<String>>,
-    pub base_url: &'a String,
+    // pub base_url: &'a str,
     pub current_exhib: &'a String,
 }
 
 
+#[allow(non_camel_case_types)]
 #[derive(Template, Serialize)]
 #[template(path="sidebar_de.html")]
 pub struct SidebarElement_de_html<'a> {
     pub all_projects: &'a Vec<Vec<String>>,
-    pub base_url: &'a String,
+    // pub base_url: &'a str,
     pub current_exhib: &'a String,
 }
 
@@ -44,10 +46,11 @@ pub struct Contact<'a> {
     pub cv_address_eng: &'a String,
     pub cv_address_de: &'a String,
     pub lang: String,
-    pub base_url: String, 
+    // pub base_url: &'a str, 
 }
 
 
+#[allow(non_camel_case_types)]
 #[derive(Template, Serialize)]
 #[template(path="bio_exhibs.html")]
 pub struct Bio_Exhibs_html<> {

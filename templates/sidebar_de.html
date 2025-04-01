@@ -14,7 +14,7 @@
             </svg>
         </label>
 
-        <a href="{{ base_url }}" class="sidebar_color_theme">
+        <a href="/" class="sidebar_color_theme">
             <h2 style="font-weight: 900; min-width: 300px;">
                 ULLA RAUTER
             </h2>
@@ -36,7 +36,7 @@
         <ul class="sub_menu">
             {% for prj in all_projects %}
             <li>
-                <a href="{{base_url}}/project/{{prj[8]}}" >
+                <a href="/project/{{prj[8]}}" >
                     {{ prj[5]}}
                 </a>
             </li>
@@ -47,10 +47,10 @@
 
     <!--    BIO, CONTACT, ADMIN SITE MENUS      -->
 
-    <a href="{{base_url}}/bio" class="sidebar_menu">
+    <a href="/bio" class="sidebar_menu">
         CV
     </a>
-    <a href="{{base_url}}/contact" class="sidebar_menu">
+    <a href="/contact" class="sidebar_menu">
         Kontakt
     </a>
 

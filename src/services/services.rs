@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use crate::{helpers::{return_fieldnames, return_filename},
             errors::HandlerError};
-use actix_web::HttpResponse;
 use serde_json::to_string;
 use crate::models::AppState;
 use std::fs::{remove_dir_all, File};
