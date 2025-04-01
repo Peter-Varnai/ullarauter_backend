@@ -12,6 +12,7 @@ use serde::Deserialize;
 
 pub struct AppState {
     pub db: Pool<Sqlite>,
+    pub pw: String,
 }
 
 #[derive(Deserialize)]

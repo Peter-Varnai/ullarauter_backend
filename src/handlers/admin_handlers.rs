@@ -17,8 +17,8 @@ use askama::Template;
 // TODO: change password to enviroment variable!!!
 //
 #[post("/login")]
-async fn login(form: Form<LoginForm>, request: HttpRequest) -> impl Responder {
-    if form.password == "passwor" {
+async fn login(state: Data<AppState>, form: Form<LoginForm>, request: HttpRequest) -> impl Responder {
+    if form.password == state.pw {
         Identity::login(&request.extensions(), "admin".into()).expect("Failed to log in");
         HttpResponse::Found().append_header(("Location", "/admin")).finish()
     } else {
@@ -355,15 +355,12 @@ async fn add_image_comment(
     form: Form<ImgCommentForm>,
     state: Data<AppState>,
     identity: Option<Identity>
-    ) -> impl Responder {
-   
+) -> Result<HttpResponse, HandlerError> {
+
     if identity.is_none() {
-        println!("identity not found, admin logged out");
         let template = LoginTemplate;
-        return match template.render() {
-            Ok(rendered) => return HttpResponse::Ok().body(rendered),
-            Err(_) => return HttpResponse::InternalServerError().finish(),
-        }
+        let login_rendered = template.render()?;
+        return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
     let form_data = form.into_inner();
@@ -371,50 +368,38 @@ async fn add_image_comment(
     let folder = form_data.folder;
     let file = form_data.file;
 
-    let comment_exists_query: Result<bool, sqlx::Error> = sqlx::query_scalar(
+    let comment_exists_query: bool = sqlx::query_scalar(
         "SELECT EXISTS(SELECT 1 FROM image_comments WHERE picture_folder = $1 AND file_name = $2)"
     )
         .bind(&folder)
         .bind(&file)
         .fetch_one(&state.db)
-        .await;
+        .await?;
 
-    match comment_exists_query {
-        Ok(result) => {
-            if result {       
-                match sqlx::query("UPDATE image_comments SET eng_comment = $1, de_comment = $2 \
+    if comment_exists_query {       
+        sqlx::query("UPDATE image_comments SET eng_comment = $1, de_comment = $2 \
                     WHERE picture_folder = $3 AND file_name = $4")
-                    .bind(form_data.eng_comment)
-                    .bind(form_data.de_comment)
-                    .bind(&folder)
-                    .bind(&file)
-                    .execute(&state.db)
-                    .await
-                    {
-                        Ok(_) => HttpResponse::Found().append_header(("Location", "/admin")).finish(),
-                        Err(_) => HttpResponse::InternalServerError().finish(),
-                    } 
-            } else {
-                match sqlx::query(
-                    "INSERT INTO image_comments (id, eng_comment, de_comment, picture_folder, file_name) \
+            .bind(form_data.eng_comment)
+            .bind(form_data.de_comment)
+            .bind(&folder)
+            .bind(&file)
+            .execute(&state.db)
+            .await?;
+
+        } else {
+            sqlx::query(
+                "INSERT INTO image_comments (id, eng_comment, de_comment, picture_folder, file_name) \
                         VALUES ($1, $2, $3, $4, $5)")
-                    .bind(new_id(&state, "image_comments").await.to_string())
-                    .bind(form_data.eng_comment)
-                    .bind(form_data.de_comment)
-                    .bind(&folder)
-                    .bind(&file)
-                    .execute(&state.db)
-                    .await
-                    {
-                        Ok(_) => HttpResponse::Found().append_header(("Location", "/admin")).finish(),
-                        Err(_) => HttpResponse::InternalServerError().finish(),
-                    }
-            }
-        }
-        Err(_) => {
-            HttpResponse::InternalServerError().body("Failed to check db")
-        }
+                .bind(new_id(&state, "image_comments").await.to_string())
+                .bind(form_data.eng_comment)
+                .bind(form_data.de_comment)
+                .bind(&folder)
+                .bind(&file)
+                .execute(&state.db)
+                .await?;
     }
+
+    Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
