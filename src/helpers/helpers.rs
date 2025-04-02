@@ -2,6 +2,7 @@
 use actix_web::http::header::ContentDisposition;
 use std::{fs::File, io::{BufReader, BufRead}, env};
 
+
 pub fn return_fieldnames(
     content_disposition: &Option<ContentDisposition>
 ) -> String {
@@ -28,6 +29,10 @@ pub fn format_date(date: &String) -> String {
 
 
 pub fn load_env_file(path: &str) {
+    if env::current_exe().unwrap().ends_with("release") {
+        return
+    }
+
     let file = File::open(path).expect(".env file not found");
     let reader = BufReader::new(file);
 

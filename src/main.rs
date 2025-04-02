@@ -52,7 +52,7 @@ async fn main() -> std::io::Result<()> {
 
     let pool_clone = pool.clone(); 
 
-    println!("{}:{}, static path: {}", host, port, static_path.display());
+    println!("  {}:{}, static path: {}", host, port, static_path.display());
     // starting daily process of refreshing the relevant exhibitions 
     // on the front page
     spawn(async move {
