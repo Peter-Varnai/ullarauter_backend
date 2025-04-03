@@ -23,15 +23,17 @@ use std::{env, path::PathBuf};
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
-    let config = config();
-    let host = config.get("host").clone();
+    let (host, port, db_url, password, static_path) = {
+        let config = config();
+        (
+            config.get("host").unwrap().to_string(),
+            config.get("port").unwrap().to_string(),
+            config.get("db_url").unwrap().to_string(),
+            config.get("password").unwrap().to_string(),
+            config.get("static_path").unwrap().to_string(),
+        )
+    };
     let secret_key = Key::generate();
-    let port = config.get("port").unwrap();
-    let host = config.get("host").unwrap();
-    let db_url = config.get("db_url").unwrap();
-    let password = config.get("password").unwrap();
-    let static_path = config.get("static_path").unwrap();
-
     let pool = SqlitePoolOptions::new()
         .connect(&db_url)
         // .connect("sqlite://db/ulla_db.db")
