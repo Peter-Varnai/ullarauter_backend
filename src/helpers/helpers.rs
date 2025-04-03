@@ -1,6 +1,6 @@
 // use serde_json::Value;
 use actix_web::http::header::ContentDisposition;
-use std::{fs::File, io::{BufReader, BufRead}, env};
+use std::{fs::File, io::{BufReader, BufRead}, env, collections::HashMap};
 
 
 pub fn return_fieldnames(
@@ -28,12 +28,12 @@ pub fn format_date(date: &String) -> String {
 }
 
 
-pub fn load_env_file(path: &str) {
+pub fn load_local_env_file() {
     if env::current_exe().unwrap().ends_with("release") {
         return
     }
 
-    let file = File::open(path).expect(".env file not found");
+    let file = File::open(".env").expect(".env file not found");
     let reader = BufReader::new(file);
 
     for line in reader.lines() {
@@ -45,4 +45,35 @@ pub fn load_env_file(path: &str) {
             env::set_var(key.trim(), value.trim());
         }
     }
+}
+
+
+pub fn config() -> HashMap<&'static str, String> {
+
+    if cfg!(debug_assertions) {
+        // running in debug/developer mode
+        load_local_env_file();
+    }
+    
+    let mut config = HashMap::new();
+
+    let host = env::var("HOST").unwrap_or("127.0.0.1".to_string());
+    let port = env::var("PORT").unwrap_or("8080".to_string());
+    println!("app running at {}:{}", host, port);
+    config.insert("host", host);
+    config.insert("port", port);
+
+    let db_addr = env::current_dir().unwrap().join("db/ulla_db.db");
+    let db_url = format!("sqlite://{}", db_addr.display());
+    println!("connecting to db on the following address: {}", db_url);
+    config.insert("db_url", db_url);
+
+    let password = env::var("ADMIN_PASSWORD").expect("failed to fetch admin password from enviroment variable.");
+    config.insert("password", password);
+    
+    let static_path = env::var("STATIC_PATH").expect("failed to fetch enviroment variable");
+    println!("static path: {}", static_path);
+    config.insert("static_path", static_path);
+
+    config
 }
