@@ -48,7 +48,7 @@ pub fn load_local_env_file() {
 }
 
 
-pub fn config() -> HashMap<&'static str, String> {
+pub fn config() -> HashMap<String, String> {
 
     if cfg!(debug_assertions) {
         // running in debug/developer mode
@@ -60,20 +60,20 @@ pub fn config() -> HashMap<&'static str, String> {
     let host = env::var("HOST").unwrap_or("127.0.0.1".to_string());
     let port = env::var("PORT").unwrap_or("8080".to_string());
     println!("app running at {}:{}", host, port);
-    config.insert("host", host);
-    config.insert("port", port);
+    config.insert("host".to_string(), host);
+    config.insert("port".to_string(), port);
 
     let db_addr = env::current_dir().unwrap().join("db/ulla_db.db");
     let db_url = format!("sqlite://{}", db_addr.display());
     println!("connecting to db on the following address: {}", db_url);
-    config.insert("db_url", db_url);
+    config.insert("db_url".to_string(), db_url);
 
     let password = env::var("ADMIN_PASSWORD").expect("failed to fetch admin password from enviroment variable.");
-    config.insert("password", password);
+    config.insert("password".to_string(), password);
     
     let static_path = env::var("STATIC_PATH").expect("failed to fetch enviroment variable");
     println!("static path: {}", static_path);
-    config.insert("static_path", static_path);
+    config.insert("static_path".to_string(), static_path);
 
     config
 }
