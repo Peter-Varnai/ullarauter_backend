@@ -94,7 +94,7 @@
                 <img class="popImage" style="width: 100%" src="/static/projects/{{ current_proj[6] }}/{{ image_urls[0] }}">
                 <div class="row" style="padding: 8px 15px">
                     {% for pic in image_urls %}
-                    {% if pic != image_urls[0] %}
+                    {% if pic != image_urls[0] || pic != " " %}
                     <div>
                         <img class="img-thumbnail popImage"
                              style=" opacity: 50%; border: 0 solid white; padding: 10px 10px 0 0; height: 70px"

@@ -33,7 +33,7 @@ pub async fn db_get_project(db: &Pool<Sqlite>, id: String) -> Vec<String> {
 
 pub async fn db_get_fp_projects(db: &Pool<Sqlite>) -> Vec<Vec<String>> {
    
-    let front_pate_query = sqlx::query("SELECT * FROM front_page_projects")
+    let front_pate_query = sqlx::query("SELECT * FROM front_pages")
         .fetch_all(db)
         .await
         .expect("Failed to fetch front page projects from db");

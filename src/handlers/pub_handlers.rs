@@ -138,8 +138,11 @@ pub async fn project(
         }
     }
 
-    let pic_urls = from_str(&*selected_project[4])?;
+    let mut pic_urls: Vec<String> = from_str(&*selected_project[4])?;
 
+    pic_urls.remove(pic_urls.len() - 1);
+
+    
     let project_template = Project {
         sidebar_html,
         lang,

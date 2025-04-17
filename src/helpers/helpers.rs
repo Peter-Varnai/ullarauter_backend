@@ -63,7 +63,7 @@ pub fn config() -> HashMap<String, String> {
     config.insert("host".to_string(), host);
     config.insert("port".to_string(), port);
 
-    let db_addr = env::current_dir().unwrap().join("db/ulla_db.db");
+    let db_addr = env::current_dir().unwrap().join("db/ulla.db");
     let db_url = format!("sqlite://{}", db_addr.display());
     println!("connecting to db on the following address: {}", db_url);
     config.insert("db_url".to_string(), db_url);

@@ -17,7 +17,6 @@ use models::AppState;
 use routes::{public_routes, admin_routes};
 use crate::{cache::{warm_cache, update_sidebar_exhibs_cache, update_sidebar_cashe},
             helpers::config};
-use std::{env, path::PathBuf};
 
 
 #[actix_web::main]
@@ -56,7 +55,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .wrap(DefaultHeaders::new().add(("X-Forwarded-Proto", "https")))
+            .wrap(DefaultHeaders::new().add(("X-Forwarded-Proto", "{proto}")))
             .wrap(SessionMiddleware::new(
                     CookieSessionStore::default(),
                     secret_key.clone()))

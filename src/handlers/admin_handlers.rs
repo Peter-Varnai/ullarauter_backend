@@ -18,6 +18,7 @@ use askama::Template;
 //
 #[post("/login")]
 async fn login(state: Data<AppState>, form: Form<LoginForm>, request: HttpRequest) -> impl Responder {
+    println!("state.pw");
     if form.password == state.pw {
         Identity::login(&request.extensions(), "admin".into()).expect("Failed to log in");
         HttpResponse::Found().append_header(("Location", "/admin")).finish()
@@ -56,7 +57,7 @@ async fn create_project(
     // exhibitions at the moment store dates as %Y%m%d, projects do: %Y-%m-%d
 
     let id = new_id(&state, "projects").await.to_string();
-    let upload_dir: String = format!("./static/projects/{}", id);
+    let upload_dir: String = format!("./static2/projects/{}", id);
 
     let form_data = process_multiform(payload, upload_dir).await;
     sqlx::query(
@@ -92,8 +93,8 @@ async fn upload_background(
         return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
-    let id = new_id(&state, "front_page_projects").await.to_string();
-    let upload_dir: String = format!("./static/front_pages/{}", id);
+    let id = new_id(&state, "front_pages").await.to_string();
+    let upload_dir: String = format!("./static2/front_pages/{}", id);
     println!("upload dir: {}", &upload_dir);
     let form_data = process_multiform(payload, upload_dir).await;
 
@@ -102,7 +103,7 @@ async fn upload_background(
         .expect("failed to retrieve profile picture"); 
 
    sqlx::query(
-        "INSERT INTO front_page_projects (id, title_eng, title_de, pictures_folder, image) VALUES ($1, $2, $3, $4, $5)")
+        "INSERT INTO front_pages (id, title_eng, title_de, pictures_folder, image) VALUES ($1, $2, $3, $4, $5)")
         .bind(&id)
         .bind(form_data.get("title_eng"))
         .bind(form_data.get("title_de"))
@@ -183,7 +184,7 @@ async fn delete_background(
         return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
-    let path = sqlx::query("SELECT pictures_folder, image FROM front_page_projects WHERE id = $1")
+    let path = sqlx::query("SELECT pictures_folder, image FROM front_pages WHERE id = $1")
         .bind(&form.id)
         .fetch_one(&state.db)
         .await?;
@@ -193,7 +194,7 @@ async fn delete_background(
 
     delete_file(format!("/front_pages/{}/{}", pictures_folder, image))?;
 
-    delete_entry(&state.db, "front_page_projects", &form.id).await?;
+    delete_entry(&state.db, "front_page", &form.id).await?;
 
     Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
@@ -252,7 +253,7 @@ async fn update_pfp(
     let path = format!("/personal_details/{}", pfp_address);
     delete_file(path)?;
     
-    let upload_dir: String = format!("./static/personal_details");
+    let upload_dir: String = format!("./static2/personal_details");
     let form_data = process_multiform(payload, upload_dir).await;
     
     let file_name = form_data.get("filenames")
