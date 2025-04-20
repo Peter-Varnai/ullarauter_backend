@@ -3,6 +3,12 @@ use actix_web::http::header::ContentDisposition;
 use std::{fs::File, io::{BufReader, BufRead}, env, collections::HashMap};
 
 
+pub fn filter_empty_strings(mut strings: Vec<String>) -> Vec<String> {
+    strings.retain(|s| !s.is_empty());
+    strings
+}
+
+
 pub fn return_fieldnames(
     content_disposition: &Option<ContentDisposition>
 ) -> String {

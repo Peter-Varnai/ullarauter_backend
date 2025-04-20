@@ -43,6 +43,7 @@ pub async fn process_multiform(
 ) -> HashMap<String, String> {
     let mut filenames = Vec::new();
     let mut text_fields: HashMap<String, String> = HashMap::new();
+    println!("uploading to folder: {}", upload_dir);
     std::fs::create_dir_all(&upload_dir).expect("failed to create folder");
 
 

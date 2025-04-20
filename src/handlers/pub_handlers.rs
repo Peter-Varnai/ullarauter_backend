@@ -10,9 +10,9 @@ use crate::{models::{Index, AdminQuery, LoginTemplate, AdminTemplate, SetLangReq
             services::{db_get_projects, db_get_fp_projects,
             db_get_details, db_get_comments, db_get_project, db_get_exhibitions},            
             cache::{SIDEBAR_LOCK, BIO_EXHIBS_LOCK},
-            errors::{HandlerError}
+            errors::HandlerError, helpers::filter_empty_strings,
             };
-use actix_identity::{Identity};
+use actix_identity::Identity;
 use actix_session::Session;
 use rand::Rng;
 use askama::Template;
@@ -138,16 +138,20 @@ pub async fn project(
         }
     }
 
-    let mut pic_urls: Vec<String> = from_str(&*selected_project[4])?;
+    let pic_urls: Vec<String> = from_str(&*selected_project[4])?;
 
-    pic_urls.remove(pic_urls.len() - 1);
+    let checked_urls = filter_empty_strings(pic_urls);
+
+    for url in &checked_urls {
+        println!("pic urls:{}", url);
+    }
 
     
     let project_template = Project {
         sidebar_html,
         lang,
         project_title: "Test".to_string(),
-        image_urls: pic_urls,
+        image_urls: checked_urls,
         image_comments: img_comm,
         current_proj: selected_project.clone(),
     };
@@ -220,9 +224,10 @@ async fn admin(
         edit_project = db_get_project(&state.db, id.to_string()).await;
         let comments = db_get_comments(&state.db, &edit_project[6]).await;
         let images: Vec<String> = from_str(&edit_project[4]).expect("failed to convert to json");
+        let checked_images = filter_empty_strings(images);
         img_comm = Vec::new();
 
-        for img in &images {
+        for img in &checked_images {
             let mut found = false; // Track if any comment was found for the image
             for comm in &comments {
                 if img == &comm[0] {
@@ -230,7 +235,7 @@ async fn admin(
                     found = true; // Mark that a comment was found
                 }
             }
-            // After checking all comments, add an empty entry if none were found
+
             if !found {
                 img_comm.push(vec![img.clone(), "".to_string(), "".to_string()]);
             }

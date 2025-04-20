@@ -164,7 +164,7 @@
 
         <!-- Bio Profile Picture -->
         <div class="tab-pane fade" id="bio" role="tabpanel" aria-labelledby="bio-tab">
-            <form action="/update_profile_picture" method="PUT" enctype="multipart/form-data">
+            <form action="/update_profile_picture" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Profile Picture:</label>
                     <input value="{{ personal_details[2] }}" type="file" name="profile_pic" class="form-control" required>

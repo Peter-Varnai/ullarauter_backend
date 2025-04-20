@@ -57,7 +57,7 @@ async fn create_project(
     // exhibitions at the moment store dates as %Y%m%d, projects do: %Y-%m-%d
 
     let id = new_id(&state, "projects").await.to_string();
-    let upload_dir: String = format!("./static2/projects/{}", id);
+    let upload_dir: String = format!("./static/projects/{}", id);
 
     let form_data = process_multiform(payload, upload_dir).await;
     sqlx::query(
@@ -94,7 +94,7 @@ async fn upload_background(
     }
 
     let id = new_id(&state, "front_pages").await.to_string();
-    let upload_dir: String = format!("./static2/front_pages/{}", id);
+    let upload_dir: String = format!("./static/front_pages/{}", id);
     println!("upload dir: {}", &upload_dir);
     let form_data = process_multiform(payload, upload_dir).await;
 
@@ -253,7 +253,7 @@ async fn update_pfp(
     let path = format!("/personal_details/{}", pfp_address);
     delete_file(path)?;
     
-    let upload_dir: String = format!("./static2/personal_details");
+    let upload_dir: String = format!("./static/personal_details");
     let form_data = process_multiform(payload, upload_dir).await;
     
     let file_name = form_data.get("filenames")
