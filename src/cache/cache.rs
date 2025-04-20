@@ -72,7 +72,7 @@ pub async fn update_sidebar_exhibs_cache(db: &Pool<Sqlite>) {
     let mut current_exhib: Vec<Vec<String>> = Vec::new();
 
     for exhib in &mut exhibitions {
-        println!("exhib date: {}", exhib[2]);
+        // println!("exhib date: {}", exhib[2]);
         let naive_till = NaiveDate::parse_from_str(&mut exhib[2], "%Y%m%d").expect("Exhibition date conversion failed");
         if now <= naive_till {
             for (i, data) in exhib.iter_mut().enumerate() {

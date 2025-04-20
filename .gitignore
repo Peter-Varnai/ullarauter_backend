@@ -1,8 +1,7 @@
 /.sqlx
 /db
-/static
-/static2
 /target
 /uploads
 .env
 /.idea
+/ulla_data

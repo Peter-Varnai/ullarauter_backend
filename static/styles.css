@@ -1,0 +1,750 @@
+
+body {
+    width: 100vw;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    overflow-x: hidden;
+}
+
+footer {
+    height: 100px;
+}
+
+/*________ADMIN SITE_________*/
+.admin_title {
+    text-decoration: underline;
+    margin: 0 0 24px 0;
+    text-align: left;
+}
+
+
+.submmit_button {
+    text-align: left;
+    margin: 32px 0 32px 0;
+}
+
+.admin_hr {
+    margin: 42px 0 42px 0;
+}
+
+.ck_editor_title {
+    margin-bottom: 8px;
+
+}
+
+
+/*________LOGIN SITE_______*/
+.login_site {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    margin-top: 20%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+
+/*_____FRONTPAGE_____*/
+.frontpage_title {
+    font-weight: 100;
+    position: absolute;
+    right: 10%;
+    bottom: 69px;
+    color: lightgrey;
+    font-size: 18px;
+}
+
+
+.frontpage_exhib_list {
+    overflow-y: auto;
+    height: 100%;
+    color: white;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+
+.frontpage_exhib_list::-webkit-scrollbar {
+    display: none;
+}
+
+
+.frontpage_bg {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+
+.frontpage_reverse-list {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+
+.fp_sidebar {
+    background-color: rgb(255, 255, 255, 100%);
+    color: grey;
+    font-weight: lighter;
+    font-size: 1.4rem;
+}
+
+
+.index-page .fp_sidebar {
+    color: white;
+    background-color: rgb(255, 255, 255, 0%);
+}
+
+
+/*_________BIO SITE_____________*/
+.bio-text {
+    margin: 0 63px;
+}
+
+.bio-site_content {
+    padding: 0 50px;
+}
+
+
+table {
+    table-layout: fixed;
+}
+
+td {
+    vertical-align: top;
+    max-width: 76vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+
+.bio_profilepic_mobile {
+    display: none;
+    width: 100%;
+    margin: 30% 0 0 0;
+}
+
+.bio_profilepic_pc {
+    width: 100%;
+    margin-bottom: 60px;
+}
+
+.bio-exhibition {
+    padding-left: 20px;
+    padding-bottom: 0;
+}
+
+
+/*______PROJECTS SITE_____*/
+.projectsite_project_ttl {
+    font-weight: 300;
+}
+
+#fade_out {
+    z-index: 4;
+    position: fixed;
+    width: 100%;
+    height: 158px;
+    background-color: white;
+    transform: translate(-40px, -158px);
+    border: #333333 3px;
+}
+
+.site-concent {
+    padding-left: 24vw;
+    padding-right: 24vw;
+    margin-top: 158px;
+}
+
+.project-text {
+    padding-bottom: 60px;
+}
+
+.project-text p {
+    margin: 0;
+}
+
+.project-video {
+    padding-top: 30px;
+    text-align: center;
+}
+
+.contact-site {
+    padding-top: 152px;
+    padding-left: 28vw;
+}
+
+.custom-thumbnail {
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.project_picture_panel {
+    margin: 0;
+}
+
+#popup {
+    opacity: 0;
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: opacity 0.25s ease;
+}
+
+svg {
+    width: 40px;
+    height: 40px;
+}
+
+.language {
+    fill: #b9b4b4;
+    margin-top: 15px;
+    width: 60px;
+    height: 1px;
+}
+
+#x {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+#left {
+    transform: rotate(180deg);
+}
+
+.arrow {
+    padding: 20px;
+}
+
+
+#centerWrap {
+    width: 80vw;
+    height: 90vh;
+    object-fit: contain;
+}
+
+#imgBig {
+    height: 98.5%;
+    object-fit: contain;
+    width: 100%;
+}
+
+#subtext {
+    position: static;
+    padding-top: 22px;
+    font-size: 12px;
+    text-align: center;
+    color: #9d9d9d;
+}
+
+
+/*__________LINK STYLES________*/
+a {
+    color: inherit;
+    text-decoration: none; /* no underline */
+}
+
+a:hover {
+    color: inherit;
+    text-decoration: none; /* no underline */
+
+}
+
+a:active {
+    color: inherit;
+    text-decoration: none; /* no underline */
+
+}
+
+
+/*_______WORKS SUBMENU______*/
+
+.works_menu {
+    position: relative;
+    margin-top: 30px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.sidebar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.works_menu .menu_toggle {
+    display: block;
+    text-decoration: none;
+}
+
+.sub_menu {
+    margin-left: 18px !important;
+}
+
+.works_menu .sub_menu {
+    list-style: none;
+}
+
+#exhibitions {
+    height: 100%;
+    overflow-y: auto;
+}
+
+#exhibitions::-webkit-scrollbar {
+    width: 0px;
+}
+
+.works_menu .sub_menu li a {
+    display: block;
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.works_menu .sub_menu li a:hover {
+}
+
+.works_menu .active .sub_menu {
+    display: block;
+}
+
+
+/*____________SIDEBAR____________*/
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    overflow-x: hidden;
+    overflow-y: visile;
+    padding-top: 20px;
+    padding-bottom: 56px;
+    margin-left: 8%;
+    padding-top: 56px;
+    padding-bottom: 56px;
+    z-index: 12;
+    display: flex;
+    flex-direction: column;
+    /*overflow: visible;*/
+}
+.sidebar_menu {
+    font-weight: lighter;
+}
+
+.sidebar_menu.active {
+  font-weight: bold;
+}
+
+.sidebar a {
+    color: #dbdada;
+    font-size: 1.4rem;
+}
+
+.sidebar li a {
+    font-size: 1rem;
+}
+
+.sidebar_project_view {
+    margin-left: 8%;
+    padding-top: 56px;
+    padding-bottom: 56px;
+}
+
+.sidebar_frontpage_view {
+    margin-left: 8%;
+    padding-top: 56px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    font-weight: 900;
+    justify-content: space-between;
+    height: 60px;
+}
+
+
+.sidebar-toggle_hide {
+    display: none;
+}
+
+
+.sidebar-toggle {
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    /*padding: 10px 10px 10px 10px;*/
+    /*width: 60px;*/
+    font-size: 16px;
+    text-align: left;
+}
+
+.sidebar_submenu_light {
+    fill: white;
+    color: white;
+    text-decoration: none;
+    font-weight: lighter;
+    font-size: 1.4rem;
+}
+
+.sidebar_submenu_light:hover {
+    color: white;
+}
+
+.sidebar_submenu_dark {
+    fill: #9f9f9f;
+    color: #9f9f9f;
+    font-weight: lighter;
+    font-size: 1.4rem;
+}
+
+.sidebar_submenu_dark h2 {
+    color: #dbdada;
+}
+
+.sidebar_submenu_dark:hover {
+    color: #646464;
+}
+
+ul li a.sidebar_submenu_light {
+    font-size: 1rem;
+}
+
+ul li a.sidebar_submenu_dark {
+    font-size: 1rem;
+}
+
+
+.sidebar ul {
+    list-style: none;
+    margin: 12px 0;
+    padding: 0;
+    font-weight: lighter;
+}
+
+.sidebar li {
+    padding: 0;
+}
+
+.fp_sidebar ul {
+    list-style: none;
+    margin: 5px 0;
+    padding: 0;
+    font-weight: lighter;
+}
+
+.fp_sidebar li {
+    padding: 0;
+}
+
+
+.fp2_sidebar ul {
+    list-style: none;
+    margin: 5px 0;
+    padding: 0;
+    font-weight: lighter;
+}
+
+.fp2_sidebar li {
+    padding: 0;
+}
+
+.sidebar_project_ttl {
+    z-index: 6;
+    position: fixed;
+    top: 52px;
+    font-weight: 100;
+    /*width: max-content;*/
+    color: #b5b5b5;
+    transform: translate(246px, 0px)
+}
+
+
+#toggle-sidebar {
+    display: none;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+
+.close {
+    color: #fff;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+@media screen and (min-width: 1340px) {
+    body:not(.frontpage_bg) {
+
+
+    }
+    .projectsite_project_ttl {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        display: none;
+        margin: 0;
+    }
+
+    .sidebar {
+        background-color: rgba(255, 255, 255, 0);
+
+    }
+
+    .project_ttl {
+        display: block;
+    }
+}
+
+
+
+@media screen and (max-width: 1340px) {
+
+    body:is(.frontpage_bg) {
+
+        .sidebar{
+            background-color:rgba(0, 0, 0, 0);
+        }
+
+        .sidebar-toggle {
+            display: none;
+        }
+    }
+
+    body:not(.frontpage_bg) {
+        footer {
+            height: 30px;
+        }
+
+        .bio-site_content {
+            padding: 0;
+            margin: 0;
+        }
+
+        .bio-exhibition {
+            padding-bottom: 8px;
+        }
+
+        .sidebar {
+            margin-left: 0;
+            padding-left: 8vw;
+            width: 280px;
+            height: 100%;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            height: 100%;
+            overflow-y: scroll;
+            overflow-x: clip;
+        }
+
+        .fp_sidebar {
+            margin-left: 0;
+            padding-left: 8vw;
+            width: 280px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+
+        .fp2_sidebar {
+            margin-left: 0;
+            padding-left: 8vw;
+            width: 100%;
+            padding: 20px 30px;
+        }
+
+        .projectsite_project_ttl {
+            font-size: 24px;
+            transform: translate(0px, -49px);
+            position: fixed;
+            z-index: 5;
+            display: block;
+            color: #b5b5b5;
+        }
+
+        .works_menu {
+            margin-top: 0;
+        }
+
+        h2 {
+            min-width: 256px;
+        }
+
+        .sidebar_submenu_dark h2 {
+            margin: 12px 0;
+            font-size: 26px;
+        }
+
+        .sidebar_project_view {
+            margin-left: 8%;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .project_picture_panel {
+            margin: 12px 0 12px 0;
+        }
+
+        .bio-text {
+            margin: 0;
+        }
+
+        .bio_profilepic_pc {
+            display: none;
+        }
+
+        .bio_profilepic_mobile {
+            display: block;
+        }
+
+
+        .site-concent {
+            padding-left: 8vw;
+            padding-right: 8vw;
+            margin-top: 130px;
+        }
+
+        .frontpage_title {
+            position: absolute;
+            right: 8%;
+            bottom: 19px;
+            color: lightgrey;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-header {
+            display: contents;
+        }
+
+        .sidebar_project_ttl {
+            display: none;
+        }
+
+
+        #subtext {
+            padding-top: 0;
+        }
+
+        @media (orientation: portrait) {
+            #subtext {
+                position: absolute;
+                bottom: 14%;
+            }
+        }
+
+
+        #toggle-sidebar:not(:checked) + .sidebar {
+            width: 50px;
+            background-color: #ffffff00;
+            padding-left: 0;
+            margin-left: 8vw;
+        }
+
+        #toggle-sidebar:not(:checked) + .sidebar ul {
+            display: none;
+        }
+
+        #toggle-sidebar:not(:checked) + .sidebar a {
+            display: none;
+        }
+
+        #toggle-sidebar:not(:checked) + .sidebar h5 {
+            display: none;
+        }
+
+        #toggle-sidebar:not(:checked) + .sidebar h5 {
+            display: none;
+        }
+
+        #toggle-sidebar:not(:checked) + .sidebar .language {
+            display: none;
+        }
+
+
+        #toggle-sidebar:not(:checked) + .fp_sidebar {
+            width: 100%;
+            background-color: white;
+            padding-left: 8vw;
+            flex-direction: unset;
+        }
+
+
+        #toggle-sidebar:not(:checked) + .fp_sidebar ul {
+            display: none;
+        }
+
+        #toggle-sidebar:not(:checked) + .fp_sidebar a {
+            display: none;
+        }
+
+        #toggle-sidebar:not(:checked) + .fp_sidebar h5 {
+            display: none;
+        }
+
+        #toggle-sidebar:not(:checked) + .fp_sidebar h5 {
+            display: none;
+        }
+
+        #toggle-sidebar:not(:checked) + .fp_sidebar .language {
+            display: none;
+        }
+
+    }
+}
+
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+
+}

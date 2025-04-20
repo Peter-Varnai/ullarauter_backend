@@ -3,7 +3,7 @@
         {% for exhib in current_exhib %}
         <li>
             {% if exhib[3] != "000" %}
-            <a href="exhib[3]" target="_blank" rel="noopener noreferrer">
+            <a href="{{ exhib[3][3..] }}" target="_blank" rel="noopener noreferrer">
                 <h7 style="font-weight: bold; color: white">
                 {{ exhib[0] }}
                 </h7>
