@@ -10,7 +10,7 @@ use actix_web::{Result, web::{Path as Ax_Path, Data, Form, Json},
                 HttpResponse, put, post, delete, Responder, get, HttpRequest, HttpMessage};
 use actix_multipart::Multipart;
 use actix_identity::{Identity};
-use sqlx::Row;
+use sqlx::{query, Row};
 use crate::models::LoginTemplate;
 use askama::Template;
 
@@ -151,7 +151,7 @@ async fn add_exhibition(
 }
 
 
-#[delete("/delete_exhibition")]
+#[post("/delete_exhibition")]
 async fn delete_exhibition(
     state: Data<AppState>, 
     form: Json<DeleteExhibitionRequest>,
@@ -171,47 +171,52 @@ async fn delete_exhibition(
 }
 
 
-#[delete("/delete_background")]
+#[post("/delete_background")]
 async fn delete_background(
     state: Data<AppState>, 
     form: Json<DeleteBackgroundRequest>,
     identity: Option<Identity>
 ) -> Result<HttpResponse, HandlerError> {
-  
+
     if identity.is_none() {
         let template = LoginTemplate;
         let login_rendered = template.render()?;
         return Ok(HttpResponse::Ok().body(login_rendered));
     }
 
-    let path = sqlx::query("SELECT pictures_folder, image FROM front_pages WHERE id = $1")
-        .bind(&form.id)
+    println!("delete background called");
+
+    let query = format!("SELECT pictures_folder, image FROM front_pages WHERE id = {}", form.id);
+
+    let path = sqlx::query(&query)
         .fetch_one(&state.db)
         .await?;
+
+    println!("query: {}", query);
 
     let pictures_folder: String = path.get("pictures_folder");
     let image: String = path.get("image");
 
+    delete_entry(&state.db, "front_pages", &form.id).await?;
     delete_file(format!("/front_pages/{}/{}", pictures_folder, image))?;
-
-    delete_entry(&state.db, "front_page", &form.id).await?;
 
     Ok(HttpResponse::Found().append_header(("Location", "/admin")).finish())
 }
 
 
-#[delete("/delete_project")]
+#[post("/delete_project")]
 async fn delete_project(
     state: Data<AppState>, 
     form: Json<DeleteProjectRequest>,
     identity: Option<Identity>
 ) -> Result<HttpResponse, HandlerError> {
-  
     if identity.is_none() {
         let template = LoginTemplate;
         let login_rendered = template.render()?;
         return Ok(HttpResponse::Ok().body(login_rendered));
     }
+
+    println!("delete project called");
 
     let path = sqlx::query("SELECT pictures_folder FROM projects WHERE id = $1")
         .bind(&form.id)

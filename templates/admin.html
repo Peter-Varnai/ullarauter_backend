@@ -351,9 +351,9 @@
     }
 
     function deleteEntry(entryId, query) {
-        console.log(entryId)
+        console.log(query, entryId)
         fetch(query, {
-            method: 'DELETE',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -364,7 +364,7 @@
                     alert('Entry deleted successfully!');
                     location.reload();
                 } else {
-                    alert('Deleted directory.' );
+                    alert('Error deleting entry.' );
                     location.reload();
                 }
             })

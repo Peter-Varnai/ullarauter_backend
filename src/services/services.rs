@@ -91,12 +91,10 @@ pub async fn delete_entry(
     table: &str,
     id: &str,
 ) -> Result<(), HandlerError> {
-    let query = format!("DELETE FROM {} WHERE id = ?", table);
+    let query = format!("DELETE FROM {} WHERE id = {}", table, id);
     
     println!("deleting entry: {}", &query);
-    sqlx::query("DELETE FROM ? WHERE id = ?")
-        .bind(table)
-        .bind(id)
+    sqlx::query(&query)
         .execute(db)
         .await?;
 
